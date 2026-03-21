@@ -9,8 +9,8 @@ command = "cd PIS && npm install"
 # D1 Database binding
 [[d1_databases]]
 binding = "DB"
-database_name = "pis-uat-db"
-database_id = "d5a1b2c3-4e5f-6789-abcd-ef0123456789"
+database_name = "pis-project-db"
+database_id = "305a38f5-34c1-49a4-b796-9b0a16a6dfe3"
 
 # Environment variables
 [env.production]
