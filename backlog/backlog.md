@@ -120,36 +120,108 @@ As a system administrator, I need a proper database schema so that product infor
 | 2026-03-21 | Start with Sprint 1: Foundation - Database + API first | Priya |
 | 2026-03-21 | Initial schema: products, locations, inventory tables | Priya |
 | 2026-03-21 | PIS-001 pushed to GitHub repository | Priya |
+| 2026-03-21 | AUTONOMOUS MODE activated — team will auto-process all stories with safety checks | Priya |
 
 ---
 
-## 🚀 Next Action
+## 🚀 AUTONOMOUS EXECUTION MODE — ACTIVE
 
-**Status:** `PIS-002` is **IN PROGRESS** with Dexter 💻
+**User Request:** "Manage team to process until project done. I will come back to review."  
+**Safety Constraint:** ⚠️ **ASK USER FIRST** before any action that could harm PC or require payment.
 
-### Instructions for Dexter 💻:
+---
 
+### TEAM WORKFLOW — AUTONOMOUS MODE
+
+**Priya 🧭** coordinates all handoffs. **No direct agent-to-agent communication.**
+
+| Stage | Owner | Trigger | Action |
+|-------|-------|---------|--------|
+| 1. Development | Dexter 💻 | Story marked `ready-for-dev` | Code + tests + push to GitHub |
+| 2. QA Review | Quinn 🔍 | Code pushed to GitHub | Test + report bugs or approve |
+| 3. Deploy | Devon 🚀 | QA marks `qa-approved` | Deploy + verify + log |
+| 4. Validation | Priya 🧭 | Deployed | Update backlog + notify user |
+
+---
+
+### CURRENT STATUS
+
+**PIS-002: Product API Endpoints** — Dexter 💻 is coding  
 **REPOSITORY:** https://github.com/pasitpipsellsuki/PIS-project
 
-**MANDATORY:** Commit and push work FREQUENTLY:
-```bash
-git add .
-git commit -m "feat: PIS-002 [description of work done]"
-git push origin master
-```
-
-**PIS-002 Tasks:**
+**Dexter's Checklist (PIS-002):**
 - [ ] Create `src/api/products.ts` — Product CRUD endpoints
 - [ ] Create `src/index.ts` — Main Worker entry point
-- [ ] Implement endpoints:
-  - GET /api/products — List all products
-  - GET /api/products/:id — Get single product
-  - POST /api/products — Create product
-  - PUT /api/products/:id — Update product
-  - DELETE /api/products/:id — Soft delete product
+- [ ] Implement endpoints: GET /api/products, GET /api/products/:id, POST /api/products, PUT /api/products/:id, DELETE /api/products/:id
 - [ ] Add unit tests in `tests/api/products.test.ts`
-- [ ] Update PROJECT_README.md with API documentation
-- [ ] Push all work to repository
-- [ ] Report completion to Priya for QA handoff
+- [ ] Update PROJECT_README.md
+- [ ] **PUSH TO GITHUB:** `git add . && git commit -m "feat: PIS-002 [desc]" && git push origin master`
+- [ ] Report to Priya: Mark as `ready-for-qa`
 
-**REMINDER:** The user is monitoring https://github.com/pasitpipsellsuki/PIS-project — keep it updated!
+---
+
+### EXECUTION PLAN — AUTO-PROCESS ALL STORIES
+
+**Sprint 1: Foundation (High Priority)**
+1. ✅ PIS-001 Database Schema — COMPLETE
+2. 🔄 PIS-002 Product API — IN PROGRESS → Dexter → Quinn → Devon
+3. ⏳ PIS-003 Location API — NEXT → Dexter → Quinn → Devon
+4. ⏳ PIS-004 Inventory API — NEXT → Dexter → Quinn → Devon
+
+**Sprint 2: Frontend (Medium Priority)**
+5. ⏳ PIS-005 Product List View — Dexter builds React UI
+6. ⏳ PIS-006 Product Detail View
+7. ⏳ PIS-007 Inventory Dashboard
+8. ⏳ PIS-008 Add/Edit Product Form
+9. ⏳ PIS-009 Stock Adjustment Form
+
+**Sprint 3: Advanced (Low Priority)**
+10. ⏳ PIS-010 Low Stock Alerts
+11. ⏳ PIS-011 Inventory Movement Tracking
+12. ⏳ PIS-012 Reports Export
+
+---
+
+### SAFETY & PAYMENT PROTOCOL
+
+⚠️ **CRITICAL: Before proceeding with any story, agents must CHECK:**
+
+| Question | Action if YES |
+|----------|---------------|
+| Does this require installing unknown executables? | STOP — Ask user first |
+| Does this require cloud service subscription? | STOP — Ask user first |
+| Does this require API keys with potential charges? | STOP — Ask user first |
+| Does this modify system settings? | STOP — Ask user first |
+| Is this running code from untrusted sources? | STOP — Ask user first |
+
+**ALLOWED without asking:**
+- Local development with Wrangler CLI (already installed)
+- SQLite/D1 database operations (local only)
+- Git commits/pushes to user's repository
+- React/TypeScript code writing
+- Unit tests with Vitest/Jest
+
+---
+
+### WHEN TO NOTIFY USER
+
+Priya will update the user when:
+1. ✅ Each Sprint is complete (all stories done)
+2. 🚨 Any blocker requires user input
+3. 💳 Any story requires payment/purchases
+4. ⚠️ Any potential PC safety concern
+5. 🎉 **PROJECT COMPLETE** — All 12 stories done and deployed
+
+---
+
+### PROGRESS TRACKING
+
+**User can monitor at any time:**
+- Code: https://github.com/pasitpipsellsuki/PIS-project
+- Backlog: `backlog/backlog.md` (committed to repo)
+
+**Current Commit:** Check `git log` in repository
+
+---
+
+**STATUS:** 🟢 **AUTONOMOUS EXECUTION ACTIVE** — Team is working through all stories automatically. User will be notified only at milestones or if safety/payment concerns arise.
