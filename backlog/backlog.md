@@ -11,7 +11,8 @@
 **What it does:** A centralized system to manage product information and stock levels across multiple store locations and warehouses.  
 **Tech stack:** Cloudflare Pages (frontend) + Cloudflare Workers (API) + Cloudflare D1 (database)  
 **Domain:** Inventory Management / Retail Operations  
-**Repo:** https://github.com/pasitpipsellsuki/PIS-project
+**Repo:** https://github.com/pasitpipsellsuki/PIS-project  
+**Project Location:** `Project archive/PIS/`
 
 ---
 
@@ -131,6 +132,7 @@ As a system administrator, I need a proper database schema so that product infor
 | 2026-03-21 | AUTONOMOUS MODE activated — team will auto-process all stories with safety checks | Priya |
 | 2026-03-21 | SPRINT 1 COMPLETE — All API endpoints (PIS-002, 003, 004) implemented and pushed | Dexter |
 | 2026-03-21 | SPRINT 2 COMPLETE — Full React frontend (PIS-005 to 009) implemented and pushed | Dexter |
+| 2026-03-21 | FOLDER REORGANIZATION — PIS project files moved to `Project archive/PIS/` | Priya |
 
 ---
 
