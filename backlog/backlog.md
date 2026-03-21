@@ -108,7 +108,7 @@ As a system administrator, I need a proper database schema so that product infor
 
 | Feature | Deployed | Date |
 |---------|----------|------|
-| PIS-001 Database Schema Design | Local | 2026-03-21 |
+| PIS-001 Database Schema Design | https://github.com/pasitpipsellsuki/PIS-project | 2026-03-21 |
 
 ---
 
@@ -119,23 +119,37 @@ As a system administrator, I need a proper database schema so that product infor
 | 2026-03-21 | Use Cloudflare D1 for database (SQLite-based, fits Cloudflare stack) | Priya |
 | 2026-03-21 | Start with Sprint 1: Foundation - Database + API first | Priya |
 | 2026-03-21 | Initial schema: products, locations, inventory tables | Priya |
+| 2026-03-21 | PIS-001 pushed to GitHub repository | Priya |
 
 ---
 
 ## 🚀 Next Action
 
-**Status:** `PIS-002` is **READY FOR DEV**
+**Status:** `PIS-002` is **IN PROGRESS** with Dexter 💻
 
-Dexter 💻 should:
-1. **PUSH PIS-001 to Repository** — Commit and push all completed work to https://github.com/pasitpipsellsuki/PIS-project
-2. **Implement PIS-002** — Build Product API Endpoints (REST API for product CRUD operations)
-3. **Update Priya** — Report progress and mark PIS-002 as `ready-for-qa` when done
+### Instructions for Dexter 💻:
 
-### ✅ Files Ready to Push (PIS-001 Complete)
-- `migrations/001_initial_schema.sql` - Complete database schema with indexes and views
-- `src/db/schema.py` - Python type definitions for all tables
-- `src/db/migrations.py` - Migration runner and utilities
-- `scripts/seed_data.py` - Sample data seeding script
-- `package.json` - Project configuration
-- `wrangler.toml` - Cloudflare Workers configuration
-- `PROJECT_README.md` - Project documentation
+**REPOSITORY:** https://github.com/pasitpipsellsuki/PIS-project
+
+**MANDATORY:** Commit and push work FREQUENTLY:
+```bash
+git add .
+git commit -m "feat: PIS-002 [description of work done]"
+git push origin master
+```
+
+**PIS-002 Tasks:**
+- [ ] Create `src/api/products.ts` — Product CRUD endpoints
+- [ ] Create `src/index.ts` — Main Worker entry point
+- [ ] Implement endpoints:
+  - GET /api/products — List all products
+  - GET /api/products/:id — Get single product
+  - POST /api/products — Create product
+  - PUT /api/products/:id — Update product
+  - DELETE /api/products/:id — Soft delete product
+- [ ] Add unit tests in `tests/api/products.test.ts`
+- [ ] Update PROJECT_README.md with API documentation
+- [ ] Push all work to repository
+- [ ] Report completion to Priya for QA handoff
+
+**REMINDER:** The user is monitoring https://github.com/pasitpipsellsuki/PIS-project — keep it updated!
