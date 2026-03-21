@@ -40,24 +40,24 @@
 
 ## Backlog (Prioritized)
 
-### Sprint 1: Foundation
+### Sprint 1: Foundation ✅ COMPLETE
 
 | ID | Story | Priority | Status |
 |----|-------|----------|--------|
-| PIS-001 | **Database Schema Design** - Design D1 tables for products, locations, inventory | High | `qa-approved` |
-| PIS-002 | **Product API Endpoints** - Create REST API for product CRUD operations | High | `ready-for-dev` |
-| PIS-003 | **Location API Endpoints** - Create REST API for store/warehouse CRUD | High | pending |
-| PIS-004 | **Inventory API Endpoints** - Create REST API to track stock levels per location | High | pending |
+| PIS-001 | **Database Schema Design** - Design D1 tables for products, locations, inventory | High | `deployed` |
+| PIS-002 | **Product API Endpoints** - Create REST API for product CRUD operations | High | `deployed` |
+| PIS-003 | **Location API Endpoints** - Create REST API for store/warehouse CRUD | High | `deployed` |
+| PIS-004 | **Inventory API Endpoints** - Create REST API to track stock levels per location | High | `deployed` |
 
-### Sprint 2: Frontend & Views
+### Sprint 2: Frontend & Views ✅ COMPLETE
 
 | ID | Story | Priority | Status |
 |----|-------|----------|--------|
-| PIS-005 | **Product List View** - Display all products with filtering and search | Medium | pending |
-| PIS-006 | **Product Detail View** - Show product info + stock across all locations | Medium | pending |
-| PIS-007 | **Inventory Dashboard** - Overview of stock levels by location | Medium | pending |
-| PIS-008 | **Add/Edit Product Form** - UI for creating and updating products | Medium | pending |
-| PIS-009 | **Stock Adjustment Form** - UI for updating inventory levels | Medium | pending |
+| PIS-005 | **Product List View** - Display all products with filtering and search | Medium | `deployed` |
+| PIS-006 | **Product Detail View** - Show product info + stock across all locations | Medium | `deployed` |
+| PIS-007 | **Inventory Dashboard** - Overview of stock levels by location | Medium | `deployed` |
+| PIS-008 | **Add/Edit Product Form** - UI for creating and updating products | Medium | `deployed` |
+| PIS-009 | **Stock Adjustment Form** - UI for updating inventory levels | Medium | `deployed` |
 
 ### Sprint 3: Advanced Features
 
@@ -104,11 +104,19 @@ As a system administrator, I need a proper database schema so that product infor
 
 ---
 
-## Done
+## Done ✅
 
 | Feature | Deployed | Date |
 |---------|----------|------|
 | PIS-001 Database Schema Design | https://github.com/pasitpipsellsuki/PIS-project | 2026-03-21 |
+| PIS-002 Product API Endpoints | https://github.com/pasitpipsellsuki/PIS-project | 2026-03-21 |
+| PIS-003 Location API Endpoints | https://github.com/pasitpipsellsuki/PIS-project | 2026-03-21 |
+| PIS-004 Inventory API Endpoints | https://github.com/pasitpipsellsuki/PIS-project | 2026-03-21 |
+| PIS-005 Product List View | https://github.com/pasitpipsellsuki/PIS-project | 2026-03-21 |
+| PIS-006 Product Detail View | https://github.com/pasitpipsellsuki/PIS-project | 2026-03-21 |
+| PIS-007 Inventory Dashboard | https://github.com/pasitpipsellsuki/PIS-project | 2026-03-21 |
+| PIS-008 Add/Edit Product Form | https://github.com/pasitpipsellsuki/PIS-project | 2026-03-21 |
+| PIS-009 Stock Adjustment Form | https://github.com/pasitpipsellsuki/PIS-project | 2026-03-21 |
 
 ---
 
@@ -121,6 +129,8 @@ As a system administrator, I need a proper database schema so that product infor
 | 2026-03-21 | Initial schema: products, locations, inventory tables | Priya |
 | 2026-03-21 | PIS-001 pushed to GitHub repository | Priya |
 | 2026-03-21 | AUTONOMOUS MODE activated — team will auto-process all stories with safety checks | Priya |
+| 2026-03-21 | SPRINT 1 COMPLETE — All API endpoints (PIS-002, 003, 004) implemented and pushed | Dexter |
+| 2026-03-21 | SPRINT 2 COMPLETE — Full React frontend (PIS-005 to 009) implemented and pushed | Dexter |
 
 ---
 
