@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // API base URL - adjust based on your deployment
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'
+const API_URL = import.meta.env.VITE_API_URL || 'https://pis-project.pasitpipsellsuki.workers.dev'
 
 export const api = axios.create({
   baseURL: API_URL,
