@@ -2,16 +2,15 @@ name = "pis-project"
 main = "src/index.ts"
 compatibility_date = "2024-02-08"
 
+# Build configuration - Install dependencies before deploying
+[build]
+command = "npm install"
+
 # D1 Database binding
 [[d1_databases]]
 binding = "DB"
-database_name = "pis-uat-db"
-database_id = ""  # Will be updated after creating database
-
-# Routes
-routes = [
-  { pattern = "pis-api.pasitpipsellsuki.workers.dev", custom_domain = false }
-]
+database_name = "pis-project-db"
+database_id = "305a38f5-34c1-49a4-b796-9b0a16a6dfe3"
 
 # Environment variables
 [env.production]
