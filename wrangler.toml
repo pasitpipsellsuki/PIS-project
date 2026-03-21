@@ -1,0 +1,16 @@
+name = "pis-project"
+main = "PIS/src/index.ts"
+compatibility_date = "2024-02-08"
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "pis-uat-db"
+database_id = "d5a1b2c3-4e5f-6789-abcd-ef0123456789"
+
+# Environment variables
+[env.production]
+name = "pis-project-prod"
+
+[env.uat]
+name = "pis-project-uat"
