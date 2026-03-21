@@ -1,0 +1,33 @@
+{
+  "name": "product-information-system",
+  "version": "0.1.0",
+  "description": "Product Information System - Manage products and inventory across multiple locations",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest",
+    "db:apply": "python -m src.db.migrations apply",
+    "db:reset": "python -m src.db.migrations reset",
+    "db:status": "python -m src.db.migrations status",
+    "db:verify": "python -m src.db.migrations verify",
+    "db:seed": "python -m scripts.seed_data",
+    "lint": "ruff check .",
+    "lint:fix": "ruff check --fix .",
+    "format": "ruff format .",
+    "typecheck": "pyright"
+  },
+  "dependencies": {
+    "itty-router": "^4.0.25"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240208.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2",
+    "wrangler": "^3.28.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "private": true
+}

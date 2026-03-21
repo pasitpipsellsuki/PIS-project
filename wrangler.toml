@@ -1,0 +1,20 @@
+name = "product-information-system"
+main = "src/index.ts"
+compatibility_date = "2024-02-08"
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "pis-db"
+database_id = "your-database-id-here"  # Replace with actual ID after creating database
+
+# Environment variables
+[env.production]
+name = "product-information-system-prod"
+
+[env.staging]
+name = "product-information-system-staging"
+
+# Secrets (set via: wrangler secret put <name>)
+# - JWT_SECRET: For authentication tokens
+# - API_KEY: For external API access
