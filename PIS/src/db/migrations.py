@@ -84,7 +84,7 @@ def apply_migrations(db_path: str | None = None) -> list[str]:
             conn.commit()
             
             applied.append(filename)
-            print(f"Applied {filename} ✓")
+            print(f"Applied {filename} [OK]")
         
         print(f"\nTotal migrations applied: {len(applied)}")
         
