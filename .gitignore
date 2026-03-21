@@ -2,7 +2,9 @@
 .opencode/
 backlog/
 AGENTS.md
-README.md
+
+# Note: Root README.md is the project README and IS committed
+# Only exclude team-specific documentation
 
 # OS files
 .DS_Store
