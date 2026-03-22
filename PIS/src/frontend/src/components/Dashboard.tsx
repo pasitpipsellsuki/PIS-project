@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { getInventorySummary, getLowStockAlerts, getProducts, getLocations } from '../api'
 
 interface ProductSummary {
@@ -62,8 +62,9 @@ export default function Dashboard() {
       setLowStockAlerts(alertsRes.data.alerts || [])
       setTotalProducts(productsRes.data.products?.length || 0)
       setTotalLocations(locationsRes.data.locations?.length || 0)
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch dashboard data:', err)
+      // Silently fail for dashboard - show partial data if available
     } finally {
       setLoading(false)
     }

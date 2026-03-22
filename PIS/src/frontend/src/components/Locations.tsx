@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { getLocations, deleteLocation, createLocation, updateLocation } from '../api'
 
 interface Location {
@@ -35,9 +35,9 @@ export default function Locations() {
       const response = await getLocations(params)
       setLocations(response.data.locations)
       setError('')
-    } catch (err) {
-      setError('Failed to fetch locations')
-      console.error(err)
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch locations')
+      console.error('Fetch locations error:', err)
     } finally {
       setLoading(false)
     }
@@ -50,7 +50,8 @@ export default function Locations() {
       await deleteLocation(id)
       setLocations(locations.filter(l => l.id !== id))
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to delete location')
+      setError(err.message || 'Failed to delete location')
+      console.error('Delete location error:', err)
     }
   }
 
@@ -69,7 +70,8 @@ export default function Locations() {
       setFormData({ name: '', type: 'store', address: '' })
       fetchLocations()
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to save location')
+      setError(err.message || 'Failed to save location')
+      console.error('Save location error:', err)
     }
   }
 

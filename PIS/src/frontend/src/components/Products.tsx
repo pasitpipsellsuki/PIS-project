@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { getProducts, deleteProduct, createProduct, updateProduct } from '../api'
 
 interface Product {
@@ -43,9 +43,9 @@ export default function Products() {
       const response = await getProducts(params)
       setProducts(response.data.products)
       setError('')
-    } catch (err) {
-      setError('Failed to fetch products')
-      console.error(err)
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch products')
+      console.error('Fetch products error:', err)
     } finally {
       setLoading(false)
     }
@@ -62,9 +62,9 @@ export default function Products() {
     try {
       await deleteProduct(id)
       setProducts(products.filter(p => p.id !== id))
-    } catch (err) {
-      setError('Failed to delete product')
-      console.error(err)
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete product')
+      console.error('Delete product error:', err)
     }
   }
 
@@ -88,7 +88,8 @@ export default function Products() {
       setFormData({ sku: '', name: '', description: '', category: '', price: '' })
       fetchProducts()
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to save product')
+      setError(err.message || 'Failed to save product')
+      console.error('Save product error:', err)
     }
   }
 

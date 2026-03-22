@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { getInventory, getLowStockAlerts, updateInventory, deleteInventory, createInventory } from '../api'
+import { useState, useEffect } from 'react'
+import { getInventory, getLowStockAlerts, updateInventory, deleteInventory } from '../api'
 
 interface InventoryItem {
   id: string
@@ -13,17 +13,6 @@ interface InventoryItem {
   location_name: string
   location_type: string
   is_low_stock: boolean
-}
-
-interface Product {
-  id: string
-  sku: string
-  name: string
-}
-
-interface Location {
-  id: string
-  name: string
 }
 
 export default function Inventory() {
@@ -50,9 +39,9 @@ export default function Inventory() {
       const response = await getInventory(params)
       setInventory(response.data.inventory)
       setError('')
-    } catch (err) {
-      setError('Failed to fetch inventory')
-      console.error(err)
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch inventory')
+      console.error('Fetch inventory error:', err)
     } finally {
       setLoading(false)
     }
@@ -73,8 +62,9 @@ export default function Inventory() {
     try {
       await deleteInventory(id)
       setInventory(inventory.filter(i => i.id !== id))
-    } catch (err) {
-      setError('Failed to delete inventory record')
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete inventory record')
+      console.error('Delete inventory error:', err)
     }
   }
 
@@ -101,7 +91,8 @@ export default function Inventory() {
       fetchInventory()
       fetchLowStock()
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to adjust inventory')
+      setError(err.message || 'Failed to adjust inventory')
+      console.error('Adjust inventory error:', err)
     }
   }
 
