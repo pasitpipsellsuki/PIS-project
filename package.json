@@ -1,0 +1,12 @@
+{
+  "name": "pis-uat-deploy",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "cd PIS/src/frontend && npm install && npm run build && cp -r dist ../../../dist",
+    "deploy": "wrangler pages deploy dist"
+  },
+  "devDependencies": {
+    "wrangler": "^3.28.1"
+  }
+}
