@@ -1,4 +1,3 @@
-import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom'
 import Products from './components/Products'
 import Locations from './components/Locations'

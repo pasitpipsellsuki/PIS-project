@@ -1,7 +1,7 @@
 import { Router } from 'itty-router';
 import type { Env } from '../index';
 
-export const locationsRouter = Router({ base: '/api/locations' });
+export const locationsRouter = Router();
 
 // Helper functions
 function generateUUID(): string {
