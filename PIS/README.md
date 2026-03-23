@@ -100,6 +100,15 @@ scripts/deploy/DEVON_DEPLOY.bat
 
 ---
 
+## 🌐 Live URLs
+
+| Environment | URL | Status |
+|-------------|-----|--------|
+| **Production (Pages)** | https://pis-project.pages.dev | 🟢 Live |
+| **Production API (Workers)** | https://pis-project-prod.pasitpipsellsuki.workers.dev | 🟢 Live |
+
+---
+
 ## 📝 Login Credentials
 
 - **Email:** admin@pis.local
@@ -107,4 +116,12 @@ scripts/deploy/DEVON_DEPLOY.bat
 
 ---
 
-*Last updated: 2026-03-23*
+## 🚀 Auto-Deployment
+
+**Status:** ✅ Active — Every push to `master` automatically deploys to Cloudflare
+
+**Monitor deployments:** https://github.com/pasitpipsellsuki/PIS-project/actions
+
+---
+
+*Last updated: 2026-03-23 by Devon 🚀*
