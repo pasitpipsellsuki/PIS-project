@@ -1,22 +1,32 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-interface LoginProps {
-  onLoginSuccess?: () => void
-}
-
-export default function Login({ onLoginSuccess }: LoginProps) {
+export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const { login, isLoading, error } = useAuth()
+  const { login, isLoading, error, clearError, isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/', { replace: true })
+    }
+  }, [isAuthenticated, navigate])
+
+  // Clear error when inputs change
+  useEffect(() => {
+    if (error) clearError()
+  }, [email, password])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     try {
       await login(email, password)
-      onLoginSuccess?.()
+      navigate('/', { replace: true })
     } catch {
       // Error is handled by AuthContext
     }

@@ -15,12 +15,40 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>
   logout: () => void
   error: string | null
+  clearError: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 const TOKEN_KEY = 'pis_auth_token'
 const USER_KEY = 'pis_user'
+
+// Axios request interceptor to add auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem(TOKEN_KEY)
+    if (token) {
+      config.headers = config.headers || {}
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
+
+// Axios response interceptor to handle auth errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid - clear storage
+      localStorage.removeItem(TOKEN_KEY)
+      localStorage.removeItem(USER_KEY)
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
@@ -33,9 +61,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const savedUser = localStorage.getItem(USER_KEY)
     
     if (token && savedUser) {
-      setUser(JSON.parse(savedUser))
-      // Set default auth header for all requests
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      try {
+        setUser(JSON.parse(savedUser))
+      } catch {
+        // Invalid user data - clear storage
+        localStorage.removeItem(TOKEN_KEY)
+        localStorage.removeItem(USER_KEY)
+      }
     }
     
     setIsLoading(false)
@@ -53,12 +85,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(TOKEN_KEY, token)
       localStorage.setItem(USER_KEY, JSON.stringify(user))
       
-      // Set default auth header
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      
       setUser(user)
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed')
+      const errorMessage = err.response?.data?.error || err.message || 'Login failed. Please try again.'
+      setError(errorMessage)
       throw err
     } finally {
       setIsLoading(false)
@@ -68,9 +98,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     localStorage.removeItem(TOKEN_KEY)
     localStorage.removeItem(USER_KEY)
-    delete api.defaults.headers.common['Authorization']
     setUser(null)
+    window.location.href = '/login'
   }
+
+  const clearError = () => setError(null)
 
   return (
     <AuthContext.Provider
@@ -81,6 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         error,
+        clearError,
       }}
     >
       {children}
