@@ -16,6 +16,11 @@ database_id = "305a38f5-34c1-49a4-b796-9b0a16a6dfe3"
 [env.production]
 name = "pis-project-prod"
 
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "pis-project-db"
+database_id = "305a38f5-34c1-49a4-b796-9b0a16a6dfe3"
+
 [env.uat]
 name = "pis-project-uat"
 
