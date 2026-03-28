@@ -25,9 +25,9 @@ productsRouter.get('/', async (request: Request, env: Env) => {
     const isActive = url.searchParams.get('is_active');
     
     let sql = `
-      SELECT 
-        p.id, p.sku, p.name, p.description, p.category, p.price, 
-        p.is_active, p.created_at, p.updated_at,
+      SELECT
+        p.id, p.sku, p.name, p.description, p.category, p.price,
+        p.product_type, p.is_active, p.created_at, p.updated_at,
         COALESCE(SUM(i.quantity), 0) as total_stock,
         COUNT(DISTINCT i.location_id) as location_count
       FROM products p
@@ -124,11 +124,18 @@ productsRouter.post('/', async (request: Request, env: Env) => {
       description?: string;
       category?: string;
       price?: number;
+      product_type?: string;
     };
-    
+
     // Validation
     if (!body.sku || !body.name) {
       return errorResponse('SKU and name are required');
+    }
+
+    const validProductTypes = ['physical', 'digital', 'service'];
+    const productType = body.product_type || 'physical';
+    if (!validProductTypes.includes(productType)) {
+      return errorResponse('product_type must be one of: physical, digital, service');
     }
     
     if (body.sku.length > 50) {
@@ -152,8 +159,8 @@ productsRouter.post('/', async (request: Request, env: Env) => {
     const now = new Date().toISOString();
     
     await env.DB.prepare(`
-      INSERT INTO products (id, sku, name, description, category, price, is_active, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)
+      INSERT INTO products (id, sku, name, description, category, price, product_type, is_active, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?)
     `).bind(
       id,
       body.sku,
@@ -161,6 +168,7 @@ productsRouter.post('/', async (request: Request, env: Env) => {
       body.description || null,
       body.category || null,
       body.price || null,
+      productType,
       now,
       now
     ).run();
@@ -207,12 +215,22 @@ productsRouter.put('/:id', async (request: Request, env: Env) => {
       description?: string;
       category?: string;
       price?: number;
+      product_type?: string;
     };
-    
+
     // Build update SQL dynamically
     const updates: string[] = [];
     const params: (string | number | null)[] = [];
-    
+
+    if (body.product_type !== undefined) {
+      const validProductTypes = ['physical', 'digital', 'service'];
+      if (!validProductTypes.includes(body.product_type)) {
+        return errorResponse('product_type must be one of: physical, digital, service');
+      }
+      updates.push('product_type = ?');
+      params.push(body.product_type);
+    }
+
     if (body.name !== undefined) {
       if (body.name.length > 255) {
         return errorResponse('Name must be 255 characters or less');

@@ -46,4 +46,4 @@ DELETE FROM users WHERE email = 'admin@pis.local';
 
 -- SHA-256 hash of "admin123" encoded as base64
 INSERT INTO users (id, email, password_hash, name, role, is_active, created_at, updated_at) VALUES
-    ('user-001', 'admin@pis.local', 'PJkJr+wlNU1VHa4hWQuybjjVPyFzuNPcPu5MBH56scE=', 'System Administrator', 'admin', 1, datetime('now'), datetime('now'));
+    ('user-001', 'admin@pis.local', 'JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=', 'System Administrator', 'admin', 1, datetime('now'), datetime('now'));

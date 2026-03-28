@@ -24,7 +24,7 @@ inventoryRouter.get('/', async (request: Request, env: Env) => {
     const lowStock = url.searchParams.get('low_stock');
     
     let sql = `
-      SELECT 
+      SELECT
         i.id,
         i.product_id,
         i.location_id,
@@ -34,6 +34,7 @@ inventoryRouter.get('/', async (request: Request, env: Env) => {
         p.sku as product_sku,
         p.name as product_name,
         p.category,
+        p.product_type,
         l.name as location_name,
         l.type as location_type,
         CASE WHEN i.quantity <= i.min_stock_level THEN 1 ELSE 0 END as is_low_stock
@@ -173,15 +174,19 @@ inventoryRouter.post('/', async (request: Request, env: Env) => {
       return errorResponse('Product ID and Location ID are required');
     }
     
-    // Check if product exists
+    // Check if product exists and is physical
     const product = await env.DB.prepare(`
-      SELECT id FROM products WHERE id = ? AND is_active = 1
+      SELECT id, product_type FROM products WHERE id = ? AND is_active = 1
     `).bind(body.product_id).first();
-    
+
     if (!product) {
       return errorResponse('Product not found', 404);
     }
-    
+
+    if ((product as any).product_type !== 'physical') {
+      return errorResponse('Inventory tracking only applies to physical products', 400);
+    }
+
     // Check if location exists
     const location = await env.DB.prepare(`
       SELECT id FROM locations WHERE id = ?

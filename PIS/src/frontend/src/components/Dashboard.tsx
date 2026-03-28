@@ -6,6 +6,7 @@ interface ProductSummary {
   sku: string
   name: string
   category: string
+  product_type: string
   location_count: number
   total_stock: number
   low_stock_locations: number
@@ -191,6 +192,7 @@ export default function Dashboard() {
               <thead>
                 <tr>
                   <th>Product</th>
+                  <th>Type</th>
                   <th>Category</th>
                   <th>Locations</th>
                   <th>Total Stock</th>
@@ -200,7 +202,7 @@ export default function Dashboard() {
               <tbody>
                 {productSummary.length === 0 ? (
                   <tr>
-                    <td colSpan={5} style={{ textAlign: 'center', padding: '20px' }}>
+                    <td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>
                       No data available
                     </td>
                   </tr>
@@ -213,20 +215,38 @@ export default function Dashboard() {
                         <small style={{ color: '#666' }}>{product.sku}</small>
                       </td>
                       <td>
+                        {product.product_type === 'service' && (
+                          <span className="badge" style={{ background: '#16a34a', color: '#fff' }}>Service</span>
+                        )}
+                        {product.product_type === 'digital' && (
+                          <span className="badge" style={{ background: '#7c3aed', color: '#fff' }}>Digital</span>
+                        )}
+                        {(!product.product_type || product.product_type === 'physical') && (
+                          <span className="badge" style={{ background: '#2563eb', color: '#fff' }}>Physical</span>
+                        )}
+                      </td>
+                      <td>
                         {product.category && (
                           <span className="badge badge-info">{product.category}</span>
                         )}
                       </td>
-                      <td>{product.location_count}</td>
-                      <td>{product.total_stock.toLocaleString()}</td>
                       <td>
-                        {product.low_stock_locations > 0 ? (
-                          <span className="badge badge-danger">
-                            {product.low_stock_locations} low
-                          </span>
-                        ) : (
-                          <span className="badge badge-success">Good</span>
-                        )}
+                        {product.product_type === 'service'
+                          ? <span style={{ color: '#6c757d', fontStyle: 'italic' }}>N/A</span>
+                          : product.location_count}
+                      </td>
+                      <td>
+                        {product.product_type === 'service'
+                          ? <span style={{ color: '#6c757d', fontStyle: 'italic' }}>Service — no inventory tracking</span>
+                          : product.total_stock.toLocaleString()}
+                      </td>
+                      <td>
+                        {product.product_type === 'service'
+                          ? <span style={{ color: '#6c757d', fontStyle: 'italic' }}>—</span>
+                          : product.low_stock_locations > 0
+                            ? <span className="badge badge-danger">{product.low_stock_locations} low</span>
+                            : <span className="badge badge-success">Good</span>
+                        }
                       </td>
                     </tr>
                   ))

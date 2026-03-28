@@ -156,6 +156,7 @@ export const createProduct = (data: {
   description?: string
   category?: string
   price?: number
+  product_type?: string
 }) => apiCallWithRetry(() => api.post('/api/products', data), 'Create product')
 
 export const updateProduct = (id: string, data: Partial<{
@@ -163,6 +164,7 @@ export const updateProduct = (id: string, data: Partial<{
   description: string
   category: string
   price: number
+  product_type: string
 }>) => apiCallWithRetry(() => api.put(`/api/products/${id}`, data), `Update product ${id}`)
 
 export const deleteProduct = (id: string) =>
@@ -221,6 +223,117 @@ export const deleteInventory = (id: string) =>
 // Health check
 export const checkHealth = () =>
   apiCallWithRetry(() => api.get('/api/health'), 'Health check')
+
+// Users API (admin only)
+export const getUsers = () =>
+  apiCallWithRetry(() => api.get('/api/users'), 'Fetch users')
+
+export const getCurrentUser = () =>
+  apiCallWithRetry(() => api.get('/api/users/me'), 'Fetch current user')
+
+export const createUser = (data: {
+  email: string
+  password: string
+  name: string
+  role: string
+}) => apiCallWithRetry(() => api.post('/api/users', data), 'Create user')
+
+export const updateUserRole = (id: string, role: string) =>
+  apiCallWithRetry(() => api.put(`/api/users/${id}/role`, { role }), `Update user role ${id}`)
+
+export const updateUserStatus = (id: string, is_active: boolean) =>
+  apiCallWithRetry(() => api.put(`/api/users/${id}/status`, { is_active }), `Update user status ${id}`)
+
+// Teams API
+export const getTeams = () =>
+  apiCallWithRetry(() => api.get('/api/teams'), 'Fetch teams')
+
+export const getTeam = (id: number) =>
+  apiCallWithRetry(() => api.get(`/api/teams/${id}`), `Fetch team ${id}`)
+
+export const createTeam = (data: {
+  name: string
+  description?: string
+  lead_user_id?: string
+}) => apiCallWithRetry(() => api.post('/api/teams', data), 'Create team')
+
+export const updateTeam = (id: number, data: {
+  name?: string
+  description?: string
+  lead_user_id?: string | null
+}) => apiCallWithRetry(() => api.put(`/api/teams/${id}`, data), `Update team ${id}`)
+
+export const deleteTeam = (id: number) =>
+  apiCallWithRetry(() => api.delete(`/api/teams/${id}`), `Delete team ${id}`)
+
+export const addTeamMember = (teamId: number, userId: string) =>
+  apiCallWithRetry(() => api.post(`/api/teams/${teamId}/members`, { user_id: userId }), `Add member to team ${teamId}`)
+
+export const removeTeamMember = (teamId: number, userId: string) =>
+  apiCallWithRetry(() => api.delete(`/api/teams/${teamId}/members/${userId}`), `Remove member from team ${teamId}`)
+
+// Plans / QMS API
+export const getPlans = () =>
+  apiCallWithRetry(() => api.get('/api/plans'), 'Fetch plans')
+
+export const getPlan = (id: number) =>
+  apiCallWithRetry(() => api.get(`/api/plans/${id}`), `Fetch plan ${id}`)
+
+export const createPlan = (data: {
+  name: string
+  description?: string
+  purchase_type?: string
+}) => apiCallWithRetry(() => api.post('/api/plans', data), 'Create plan')
+
+export const updatePlan = (id: number, data: Partial<{
+  name: string
+  description: string
+  purchase_type: string
+  is_active: boolean
+}>) => apiCallWithRetry(() => api.put(`/api/plans/${id}`, data), `Update plan ${id}`)
+
+export const deletePlan = (id: number) =>
+  apiCallWithRetry(() => api.delete(`/api/plans/${id}`), `Delete plan ${id}`)
+
+export const addPlanItem = (planId: number, productId: string | number) =>
+  apiCallWithRetry(() => api.post(`/api/plans/${planId}/items`, { product_id: productId }), `Add item to plan ${planId}`)
+
+export const removePlanItem = (planId: number, itemId: number) =>
+  apiCallWithRetry(() => api.delete(`/api/plans/${planId}/items/${itemId}`), `Remove item ${itemId} from plan ${planId}`)
+
+export const setPlanQuotaRule = (planId: number, data: {
+  rule_type: string
+  value: number
+  unit?: string
+}) => apiCallWithRetry(() => api.post(`/api/plans/${planId}/quota-rules`, data), `Set quota rule for plan ${planId}`)
+
+export const removePlanQuotaRule = (planId: number) =>
+  apiCallWithRetry(() => api.delete(`/api/plans/${planId}/quota-rules`), `Remove quota rule for plan ${planId}`)
+
+export const getPlanCustomers = (planId: number) =>
+  apiCallWithRetry(() => api.get(`/api/plans/${planId}/customers`), `Fetch customers for plan ${planId}`)
+
+export const addPlanCustomer = (planId: number, data: {
+  customer_name: string
+  customer_email?: string
+  start_date?: string
+  end_date?: string
+}) => apiCallWithRetry(() => api.post(`/api/plans/${planId}/customers`, data), `Add customer to plan ${planId}`)
+
+export const updatePlanCustomer = (id: number, data: Partial<{
+  customer_name: string
+  customer_email: string
+  quota_used: number
+  status: string
+  start_date: string
+  end_date: string
+}>) => apiCallWithRetry(() => api.put(`/api/plan-customers/${id}`, data), `Update plan customer ${id}`)
+
+export const deletePlanCustomer = (id: number) =>
+  apiCallWithRetry(() => api.delete(`/api/plan-customers/${id}`), `Delete plan customer ${id}`)
+
+export const getPlanStats = (planId: number) =>
+  apiCallWithRetry(() => api.get(`/api/plans/${planId}/stats`), `Fetch stats for plan ${planId}`)
 
 // Export helper for direct use
 export { getErrorMessage }

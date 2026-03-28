@@ -1,8 +1,7 @@
 import { Router } from 'itty-router';
 import type { Env } from '../index';
 
-// No base path - we're already mounted at /api/auth/* in main router
-export const authRouter = Router();
+export const authRouter = Router({ base: '/api/auth' });
 
 // JWT Secret - in production, use environment variable
 const JWT_SECRET = 'pis-secret-key-2024';
@@ -100,7 +99,7 @@ authRouter.post('/login', async (request: Request, env: Env) => {
     
     // Find user by email
     const user = await env.DB.prepare(`
-      SELECT id, email, password_hash, name, role, is_active
+      SELECT id, email, password_hash, name, rbac_role as role, is_active
       FROM users
       WHERE email = ? AND is_active = 1
     `).bind(body.email).first();
@@ -186,14 +185,14 @@ authRouter.post('/register', async (request: Request, env: Env) => {
     const now = new Date().toISOString();
     
     await env.DB.prepare(`
-      INSERT INTO users (id, email, password_hash, name, role, is_active, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, 1, ?, ?)
+      INSERT INTO users (id, email, password_hash, name, role, rbac_role, is_active, created_at, updated_at)
+      VALUES (?, ?, ?, ?, 'user', ?, 1, ?, ?)
     `).bind(
       id,
       body.email,
       passwordHash,
       body.name,
-      body.role || 'user',
+      body.role || 'staff',
       now,
       now
     ).run();
@@ -203,7 +202,7 @@ authRouter.post('/register', async (request: Request, env: Env) => {
         id,
         email: body.email,
         name: body.name,
-        role: body.role || 'user',
+        role: body.role || 'staff',
       },
       message: 'User registered successfully',
     }), {
@@ -232,7 +231,7 @@ authRouter.get('/me', async (request: Request, env: Env) => {
     }
     
     const user = await env.DB.prepare(`
-      SELECT id, email, name, role, is_active, last_login, created_at
+      SELECT id, email, name, rbac_role as role, is_active, last_login, created_at
       FROM users
       WHERE id = ? AND is_active = 1
     `).bind(payload.userId).first();

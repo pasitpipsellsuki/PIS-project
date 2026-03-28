@@ -1,11 +1,44 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { api } from '../api'
 
+export type UserRole = 'admin' | 'manager' | 'staff' | 'viewer'
+
 interface User {
   id: string
   email: string
   name: string
-  role: string
+  role: UserRole
+  team_id?: number | null
+  team_name?: string | null
+}
+
+// Permission matrix per role
+const PERMISSIONS: Record<UserRole, string[]> = {
+  admin: [
+    'view:products', 'create:products', 'edit:products', 'delete:products',
+    'view:locations', 'create:locations', 'edit:locations', 'delete:locations',
+    'view:inventory', 'create:inventory', 'edit:inventory', 'delete:inventory',
+    'view:users', 'create:users', 'edit:users', 'delete:users', 'manage:roles',
+    'view:teams', 'create:teams', 'edit:teams', 'delete:teams', 'manage:members',
+  ],
+  manager: [
+    'view:products', 'create:products', 'edit:products',
+    'view:locations', 'create:locations', 'edit:locations',
+    'view:inventory', 'create:inventory', 'edit:inventory',
+    'view:teams', 'create:teams', 'edit:teams', 'manage:members',
+  ],
+  staff: [
+    'view:products',
+    'view:locations',
+    'view:inventory', 'create:inventory', 'edit:inventory',
+    'view:teams',
+  ],
+  viewer: [
+    'view:products',
+    'view:locations',
+    'view:inventory',
+    'view:teams',
+  ],
 }
 
 interface AuthContextType {
@@ -16,6 +49,9 @@ interface AuthContextType {
   logout: () => void
   error: string | null
   clearError: () => void
+  hasPermission: (permission: string) => boolean
+  isAdmin: boolean
+  isManagerOrAbove: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -59,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = localStorage.getItem(TOKEN_KEY)
     const savedUser = localStorage.getItem(USER_KEY)
-    
+
     if (token && savedUser) {
       try {
         setUser(JSON.parse(savedUser))
@@ -69,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem(USER_KEY)
       }
     }
-    
+
     setIsLoading(false)
   }, [])
 
@@ -77,14 +113,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true)
       setError(null)
-      
+
       const response = await api.post('/api/auth/login', { email, password })
       const { token, user } = response.data
-      
+
       // Save to localStorage
       localStorage.setItem(TOKEN_KEY, token)
       localStorage.setItem(USER_KEY, JSON.stringify(user))
-      
+
       setUser(user)
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || err.message || 'Login failed. Please try again.'
@@ -104,6 +140,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const clearError = () => setError(null)
 
+  const hasPermission = (permission: string): boolean => {
+    if (!user) return false
+    const role = user.role as UserRole
+    const perms = PERMISSIONS[role] || []
+    return perms.includes(permission)
+  }
+
+  const isAdmin = user?.role === 'admin'
+  const isManagerOrAbove = user?.role === 'admin' || user?.role === 'manager'
+
   return (
     <AuthContext.Provider
       value={{
@@ -114,6 +160,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         error,
         clearError,
+        hasPermission,
+        isAdmin,
+        isManagerOrAbove,
       }}
     >
       {children}
