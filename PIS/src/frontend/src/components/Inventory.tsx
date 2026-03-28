@@ -40,7 +40,6 @@ export default function Inventory() {
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null)
   const [showAdjustModal, setShowAdjustModal] = useState(false)
 
-  // Add to Inventory modal state
   const [showAddModal, setShowAddModal] = useState(false)
   const [products, setProducts] = useState<Product[]>([])
   const [locations, setLocations] = useState<Location[]>([])
@@ -130,7 +129,6 @@ export default function Inventory() {
     setShowAddModal(true)
     try {
       const [prodRes, locRes] = await Promise.all([getProducts(), getLocations()])
-      // Only physical products can have inventory
       const allProducts: Product[] = prodRes.data.products || []
       setProducts(allProducts.filter((p: Product) => p.product_type === 'physical' || !p.product_type))
       setLocations(locRes.data.locations || [])
@@ -178,71 +176,78 @@ export default function Inventory() {
 
   return (
     <div>
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2>Inventory Management</h2>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+      {/* Low Stock Alert Banner */}
+      {lowStockItems.length > 0 && !showLowStock && (
+        <div className="table-container" style={{ marginBottom: '20px', borderColor: 'var(--warning)' }}>
+          <div className="table-toolbar" style={{ background: 'var(--warning-bg)' }}>
+            <div className="table-title" style={{ color: 'var(--warning-text)' }}>
+              ⚠️ Low Stock Alerts ({lowStockItems.length})
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Location</th>
+                <th>Current</th>
+                <th>Min Level</th>
+                <th>Shortage</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lowStockItems.slice(0, 5).map((item: any) => (
+                <tr key={item.product_id + item.location_id} className="row-warning">
+                  <td>{item.name} <span className="td-muted">({item.sku})</span></td>
+                  <td>{item.location_name}</td>
+                  <td>{item.quantity}</td>
+                  <td>{item.min_stock_level}</td>
+                  <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{item.shortage}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {lowStockItems.length > 5 && (
+            <div style={{ padding: '12px 16px', fontSize: '13px', color: 'var(--warning-text)', fontStyle: 'italic', borderTop: '1px solid var(--border-light)' }}>
+              And {lowStockItems.length - 5} more items need restocking...
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="table-container">
+        <div className="table-toolbar">
+          <span className="table-title">
+            {showLowStock ? 'Low Stock Items' : 'All Inventory'}
+          </span>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <button
-              className={`btn ${showLowStock ? 'btn-primary' : 'btn-secondary'}`}
+              className={`btn btn-sm ${showLowStock ? 'btn-primary' : 'btn-secondary'}`}
               onClick={() => setShowLowStock(!showLowStock)}
             >
-              {showLowStock ? 'Show All' : 'Show Low Stock Only'}
+              {showLowStock ? 'Show All' : 'Low Stock Only'}
             </button>
             {lowStockItems.length > 0 && (
               <span className="badge badge-danger">
-                {lowStockItems.length} Low Stock Alert{lowStockItems.length !== 1 ? 's' : ''}
+                {lowStockItems.length} alert{lowStockItems.length !== 1 ? 's' : ''}
               </span>
             )}
             {hasPermission('create:inventory') && (
-              <button className="btn btn-primary" onClick={openAddModal}>
+              <button className="btn btn-primary btn-sm" onClick={openAddModal}>
                 + Add to Inventory
               </button>
             )}
           </div>
         </div>
 
-        {error && <div className="error">{error}</div>}
-
-        {lowStockItems.length > 0 && !showLowStock && (
-          <div className="card" style={{ backgroundColor: '#fff3cd', marginBottom: '20px', border: '1px solid #ffc107' }}>
-            <h3 style={{ marginBottom: '10px', color: '#856404' }}>Low Stock Alerts</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Location</th>
-                  <th>Current</th>
-                  <th>Min Level</th>
-                  <th>Shortage</th>
-                </tr>
-              </thead>
-              <tbody>
-                {lowStockItems.slice(0, 5).map((item: any) => (
-                  <tr key={item.product_id + item.location_id}>
-                    <td>{item.name} ({item.sku})</td>
-                    <td>{item.location_name}</td>
-                    <td>{item.quantity}</td>
-                    <td>{item.min_stock_level}</td>
-                    <td style={{ color: 'red', fontWeight: 'bold' }}>{item.shortage}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {lowStockItems.length > 5 && (
-              <p style={{ marginTop: '10px', fontStyle: 'italic', color: '#856404' }}>
-                And {lowStockItems.length - 5} more items need restocking...
-              </p>
-            )}
-          </div>
-        )}
+        {error && <div className="error" style={{ margin: '16px' }}>{error}</div>}
 
         {loading ? (
           <div className="loading">Loading inventory...</div>
         ) : inventory.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6c757d' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>📦</div>
-            <h3 style={{ marginBottom: '8px', color: '#343a40' }}>No inventory records yet</h3>
-            <p style={{ marginBottom: '20px' }}>
+          <div className="empty-state">
+            <div className="empty-state-icon">📦</div>
+            <h3>No inventory records yet</h3>
+            <p>
               {showLowStock
                 ? 'No low-stock items found — your inventory looks healthy!'
                 : 'Create products and add them to inventory to get started.'}
@@ -270,44 +275,42 @@ export default function Inventory() {
               {inventory.map(item => {
                 const isLow = item.min_stock_level > 0 && item.quantity <= item.min_stock_level
                 return (
-                <tr key={item.id} style={isLow ? { backgroundColor: '#fff3cd' } : undefined}>
-                  <td>
-                    {item.product_name}
-                    {isLow && (
-                      <span className="badge badge-warning" style={{ marginLeft: '8px' }}>Low Stock</span>
-                    )}
-                  </td>
-                  <td>
-                    <span className="badge badge-info">{item.product_sku}</span>
-                  </td>
-                  <td>
-                    {item.location_name}
-                    <br />
-                    <small style={{ color: '#666' }}>{item.location_type}</small>
-                  </td>
-                  <td style={{ fontWeight: 'bold', color: isLow ? '#856404' : undefined }}>{item.quantity}</td>
-                  <td>{item.min_stock_level}</td>
-                  <td>{getStockBadge(item.quantity, item.min_stock_level)}</td>
-                  <td>
-                    {hasPermission('edit:inventory') && (
-                      <button
-                        className="btn btn-secondary"
-                        style={{ marginRight: '8px' }}
-                        onClick={() => handleAdjust(item)}
-                      >
-                        Adjust Stock
-                      </button>
-                    )}
-                    {hasPermission('delete:inventory') && (
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => handleDelete(item.id)}
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </td>
-                </tr>
+                  <tr key={item.id} className={isLow ? 'row-warning' : undefined}>
+                    <td>
+                      <strong>{item.product_name}</strong>
+                    </td>
+                    <td>
+                      <span className="badge badge-info">{item.product_sku}</span>
+                    </td>
+                    <td>
+                      {item.location_name}
+                      <br />
+                      <span className="td-muted">{item.location_type}</span>
+                    </td>
+                    <td style={{ fontWeight: '700', color: isLow ? 'var(--warning-text)' : undefined }}>{item.quantity}</td>
+                    <td>{item.min_stock_level}</td>
+                    <td>{getStockBadge(item.quantity, item.min_stock_level)}</td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        {hasPermission('edit:inventory') && (
+                          <button
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => handleAdjust(item)}
+                          >
+                            Adjust
+                          </button>
+                        )}
+                        {hasPermission('delete:inventory') && (
+                          <button
+                            className="btn btn-danger btn-sm"
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
                 )
               })}
             </tbody>
@@ -323,36 +326,38 @@ export default function Inventory() {
               <h2>Adjust Stock</h2>
               <button className="close-btn" onClick={() => setShowAdjustModal(false)}>&times;</button>
             </div>
-            <div style={{ marginBottom: '20px', background: '#f8f9fa', padding: '12px', borderRadius: '6px' }}>
-              <p><strong>Product:</strong> {selectedItem.product_name}</p>
-              <p><strong>SKU:</strong> {selectedItem.product_sku}</p>
-              <p><strong>Location:</strong> {selectedItem.location_name}</p>
-              <p><strong>Current Quantity:</strong> {selectedItem.quantity}</p>
+            <div className="modal-body">
+              <div style={{ marginBottom: '16px', background: 'var(--surface-2)', padding: '12px 16px', borderRadius: 'var(--radius-sm)', fontSize: '13.5px' }}>
+                <p><strong>Product:</strong> {selectedItem.product_name}</p>
+                <p style={{ marginTop: '4px' }}><strong>SKU:</strong> {selectedItem.product_sku}</p>
+                <p style={{ marginTop: '4px' }}><strong>Location:</strong> {selectedItem.location_name}</p>
+                <p style={{ marginTop: '4px' }}><strong>Current Quantity:</strong> {selectedItem.quantity}</p>
+              </div>
+              <form onSubmit={submitAdjustment}>
+                <div className="form-group">
+                  <label>Adjustment Amount *</label>
+                  <input
+                    type="number"
+                    value={adjustmentAmount}
+                    onChange={e => setAdjustmentAmount(e.target.value)}
+                    placeholder="e.g. +10 to add, -5 to remove"
+                    required
+                    autoFocus
+                  />
+                  <small style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '4px' }}>
+                    Positive = add stock &nbsp;|&nbsp; Negative = remove stock
+                  </small>
+                </div>
+                <div className="modal-footer" style={{ padding: '0', marginTop: '8px' }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowAdjustModal(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary">
+                    Update Stock
+                  </button>
+                </div>
+              </form>
             </div>
-            <form onSubmit={submitAdjustment}>
-              <div className="form-group">
-                <label>Adjustment Amount *</label>
-                <input
-                  type="number"
-                  value={adjustmentAmount}
-                  onChange={e => setAdjustmentAmount(e.target.value)}
-                  placeholder="e.g. +10 to add stock, -5 to remove"
-                  required
-                  autoFocus
-                />
-                <small style={{ color: '#666' }}>
-                  Positive = add stock &nbsp;|&nbsp; Negative = remove stock
-                </small>
-              </div>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowAdjustModal(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  Update Stock
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
@@ -365,74 +370,76 @@ export default function Inventory() {
               <h2>Add Product to Inventory</h2>
               <button className="close-btn" onClick={() => setShowAddModal(false)}>&times;</button>
             </div>
-            {products.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: '#6c757d' }}>
-                <p>No products found. Please create products first.</p>
-                <button className="btn btn-secondary" style={{ marginTop: '12px' }} onClick={() => setShowAddModal(false)}>
-                  Close
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={submitAddInventory}>
-                <div className="form-group">
-                  <label>Product *</label>
-                  <select
-                    value={addForm.product_id}
-                    onChange={e => setAddForm({ ...addForm, product_id: e.target.value })}
-                    required
-                  >
-                    <option value="">-- Select a product --</option>
-                    {products.map(p => (
-                      <option key={p.id} value={p.id}>
-                        {p.name} ({p.sku})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Location *</label>
-                  <select
-                    value={addForm.location_id}
-                    onChange={e => setAddForm({ ...addForm, location_id: e.target.value })}
-                    required
-                  >
-                    <option value="">-- Select a location --</option>
-                    {locations.map(l => (
-                      <option key={l.id} value={l.id}>
-                        {l.name} ({l.type})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Initial Quantity</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={addForm.quantity}
-                    onChange={e => setAddForm({ ...addForm, quantity: e.target.value })}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Minimum Stock Level</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={addForm.min_stock_level}
-                    onChange={e => setAddForm({ ...addForm, min_stock_level: e.target.value })}
-                  />
-                  <small style={{ color: '#666' }}>Alert threshold for low stock warnings</small>
-                </div>
-                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
-                  <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary" disabled={addLoading}>
-                    {addLoading ? 'Adding...' : 'Add to Inventory'}
+            <div className="modal-body">
+              {products.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)' }}>
+                  <p>No products found. Please create products first.</p>
+                  <button className="btn btn-secondary" style={{ marginTop: '12px' }} onClick={() => setShowAddModal(false)}>
+                    Close
                   </button>
                 </div>
-              </form>
-            )}
+              ) : (
+                <form onSubmit={submitAddInventory}>
+                  <div className="form-group">
+                    <label>Product *</label>
+                    <select
+                      value={addForm.product_id}
+                      onChange={e => setAddForm({ ...addForm, product_id: e.target.value })}
+                      required
+                    >
+                      <option value="">-- Select a product --</option>
+                      {products.map(p => (
+                        <option key={p.id} value={p.id}>
+                          {p.name} ({p.sku})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Location *</label>
+                    <select
+                      value={addForm.location_id}
+                      onChange={e => setAddForm({ ...addForm, location_id: e.target.value })}
+                      required
+                    >
+                      <option value="">-- Select a location --</option>
+                      {locations.map(l => (
+                        <option key={l.id} value={l.id}>
+                          {l.name} ({l.type})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Initial Quantity</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={addForm.quantity}
+                      onChange={e => setAddForm({ ...addForm, quantity: e.target.value })}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Minimum Stock Level</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={addForm.min_stock_level}
+                      onChange={e => setAddForm({ ...addForm, min_stock_level: e.target.value })}
+                    />
+                    <small style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '4px' }}>Alert threshold for low stock warnings</small>
+                  </div>
+                  <div className="modal-footer" style={{ padding: '0', marginTop: '8px' }}>
+                    <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn btn-primary" disabled={addLoading}>
+                      {addLoading ? 'Adding...' : 'Add to Inventory'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       )}

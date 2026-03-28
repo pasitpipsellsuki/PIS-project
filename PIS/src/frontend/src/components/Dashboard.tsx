@@ -46,8 +46,7 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true)
-      
-      // Fetch all data in parallel
+
       const [summaryRes, alertsRes, productsRes, locationsRes] = await Promise.all([
         getInventorySummary('product'),
         getLowStockAlerts(),
@@ -56,16 +55,15 @@ export default function Dashboard() {
       ])
 
       setProductSummary(summaryRes.data.product_summary || [])
-      
+
       const locationRes = await getInventorySummary('location')
       setLocationSummary(locationRes.data.location_summary || [])
-      
+
       setLowStockAlerts(alertsRes.data.alerts || [])
       setTotalProducts(productsRes.data.products?.length || 0)
       setTotalLocations(locationsRes.data.locations?.length || 0)
     } catch (err: any) {
       console.error('Failed to fetch dashboard data:', err)
-      // Silently fail for dashboard - show partial data if available
     } finally {
       setLoading(false)
     }
@@ -76,8 +74,6 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h2 style={{ marginBottom: '20px' }}>Dashboard Overview</h2>
-
       {loading ? (
         <div className="loading">Loading dashboard...</div>
       ) : (
@@ -85,31 +81,37 @@ export default function Dashboard() {
           {/* Stats Grid */}
           <div className="stats-grid">
             <div className="stat-card">
-              <h3>Total Products</h3>
-              <div className="value">{totalProducts}</div>
+              <div className="stat-card-icon">📦</div>
+              <div className="stat-card-value">{totalProducts}</div>
+              <div className="stat-card-label">Total Products</div>
             </div>
             <div className="stat-card">
-              <h3>Total Locations</h3>
-              <div className="value">{totalLocations}</div>
+              <div className="stat-card-icon">📍</div>
+              <div className="stat-card-value">{totalLocations}</div>
+              <div className="stat-card-label">Total Locations</div>
             </div>
             <div className="stat-card">
-              <h3>Total Inventory Units</h3>
-              <div className="value">{totalInventory.toLocaleString()}</div>
+              <div className="stat-card-icon">🗃️</div>
+              <div className="stat-card-value">{totalInventory.toLocaleString()}</div>
+              <div className="stat-card-label">Total Inventory Units</div>
             </div>
             <div className="stat-card">
-              <h3>Low Stock Alerts</h3>
-              <div className="value" style={{ color: totalLowStock > 0 ? '#dc3545' : '#28a745' }}>
+              <div className="stat-card-icon">⚠️</div>
+              <div className="stat-card-value" style={{ color: totalLowStock > 0 ? 'var(--danger)' : 'var(--success)' }}>
                 {totalLowStock}
               </div>
+              <div className="stat-card-label">Low Stock Alerts</div>
             </div>
           </div>
 
           {/* Low Stock Alerts */}
           {totalLowStock > 0 && (
-            <div className="card" style={{ backgroundColor: '#fff3cd', border: '1px solid #ffeaa7' }}>
-              <h3 style={{ marginBottom: '15px', color: '#856404' }}>
-                ⚠️ Low Stock Alerts ({totalLowStock})
-              </h3>
+            <div className="table-container" style={{ marginBottom: '20px' }}>
+              <div className="table-toolbar">
+                <div className="table-title" style={{ color: 'var(--warning-text)' }}>
+                  ⚠️ Low Stock Alerts ({totalLowStock})
+                </div>
+              </div>
               <table>
                 <thead>
                   <tr>
@@ -122,27 +124,33 @@ export default function Dashboard() {
                 </thead>
                 <tbody>
                   {lowStockAlerts.slice(0, 10).map((alert, index) => (
-                    <tr key={index}>
-                      <td><strong>{alert.name}</strong><br/><small>{alert.sku}</small></td>
+                    <tr key={index} className="row-warning">
+                      <td>
+                        <strong>{alert.name}</strong>
+                        <br/>
+                        <span className="td-muted">{alert.sku}</span>
+                      </td>
                       <td>{alert.location_name}</td>
-                      <td style={{ fontWeight: 'bold', color: '#dc3545' }}>{alert.quantity}</td>
+                      <td style={{ fontWeight: '700', color: 'var(--danger)' }}>{alert.quantity}</td>
                       <td>{alert.min_stock_level}</td>
-                      <td style={{ color: '#dc3545', fontWeight: 'bold' }}>+{alert.shortage}</td>
+                      <td style={{ color: 'var(--danger)', fontWeight: '700' }}>+{alert.shortage}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
               {totalLowStock > 10 && (
-                <p style={{ marginTop: '15px', textAlign: 'center' }}>
-                  <em>And {totalLowStock - 10} more items need attention...</em>
-                </p>
+                <div style={{ padding: '12px 16px', textAlign: 'center', fontSize: '13px', color: 'var(--text-muted)', borderTop: '1px solid var(--border-light)' }}>
+                  And {totalLowStock - 10} more items need attention...
+                </div>
               )}
             </div>
           )}
 
           {/* Inventory by Location */}
-          <div className="card">
-            <h3 style={{ marginBottom: '15px' }}>Inventory by Location</h3>
+          <div className="table-container">
+            <div className="table-toolbar">
+              <div className="table-title">Inventory by Location</div>
+            </div>
             <table>
               <thead>
                 <tr>
@@ -156,16 +164,16 @@ export default function Dashboard() {
               <tbody>
                 {locationSummary.length === 0 ? (
                   <tr>
-                    <td colSpan={5} style={{ textAlign: 'center', padding: '20px' }}>
+                    <td colSpan={5} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
                       No data available
                     </td>
                   </tr>
                 ) : (
                   locationSummary.map(location => (
                     <tr key={location.id}>
-                      <td>{location.location_name}</td>
+                      <td><strong>{location.location_name}</strong></td>
                       <td>
-                        <span className={`badge badge-${location.location_type === 'store' ? 'info' : 'success'}`}>
+                        <span className={`badge ${location.location_type === 'store' ? 'badge-info' : 'badge-success'}`}>
                           {location.location_type}
                         </span>
                       </td>
@@ -186,8 +194,10 @@ export default function Dashboard() {
           </div>
 
           {/* Top Products by Stock */}
-          <div className="card">
-            <h3 style={{ marginBottom: '15px' }}>Product Stock Overview</h3>
+          <div className="table-container">
+            <div className="table-toolbar">
+              <div className="table-title">Product Stock Overview</div>
+            </div>
             <table>
               <thead>
                 <tr>
@@ -202,7 +212,7 @@ export default function Dashboard() {
               <tbody>
                 {productSummary.length === 0 ? (
                   <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>
+                    <td colSpan={6} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
                       No data available
                     </td>
                   </tr>
@@ -212,17 +222,17 @@ export default function Dashboard() {
                       <td>
                         <strong>{product.name}</strong>
                         <br />
-                        <small style={{ color: '#666' }}>{product.sku}</small>
+                        <span className="td-muted">{product.sku}</span>
                       </td>
                       <td>
                         {product.product_type === 'service' && (
-                          <span className="badge" style={{ background: '#16a34a', color: '#fff' }}>Service</span>
+                          <span className="badge badge-service">Service</span>
                         )}
                         {product.product_type === 'digital' && (
-                          <span className="badge" style={{ background: '#7c3aed', color: '#fff' }}>Digital</span>
+                          <span className="badge badge-digital">Digital</span>
                         )}
                         {(!product.product_type || product.product_type === 'physical') && (
-                          <span className="badge" style={{ background: '#2563eb', color: '#fff' }}>Physical</span>
+                          <span className="badge badge-physical">Physical</span>
                         )}
                       </td>
                       <td>
@@ -232,17 +242,17 @@ export default function Dashboard() {
                       </td>
                       <td>
                         {product.product_type === 'service'
-                          ? <span style={{ color: '#6c757d', fontStyle: 'italic' }}>N/A</span>
+                          ? <span className="td-muted">N/A</span>
                           : product.location_count}
                       </td>
                       <td>
                         {product.product_type === 'service'
-                          ? <span style={{ color: '#6c757d', fontStyle: 'italic' }}>Service — no inventory tracking</span>
+                          ? <span className="td-muted">Service</span>
                           : product.total_stock.toLocaleString()}
                       </td>
                       <td>
                         {product.product_type === 'service'
-                          ? <span style={{ color: '#6c757d', fontStyle: 'italic' }}>—</span>
+                          ? <span className="td-muted">—</span>
                           : product.low_stock_locations > 0
                             ? <span className="badge badge-danger">{product.low_stock_locations} low</span>
                             : <span className="badge badge-success">Good</span>

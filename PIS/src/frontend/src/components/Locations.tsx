@@ -108,31 +108,43 @@ export default function Locations() {
 
   return (
     <div>
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2>Locations</h2>
-          {hasPermission('create:locations') && (
-            <button className="btn btn-primary" onClick={handleAdd}>+ Add Location</button>
-          )}
+      <div className="table-container">
+        <div className="table-toolbar">
+          <span className="table-title">All Locations ({locations.length})</span>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              style={{
+                padding: '7px 12px',
+                border: '1.5px solid var(--border)',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: '13px',
+                fontFamily: 'inherit',
+                color: 'var(--text-primary)',
+                background: 'var(--surface)',
+                outline: 'none',
+              }}
+            >
+              <option value="">All Types</option>
+              <option value="store">Stores</option>
+              <option value="warehouse">Warehouses</option>
+            </select>
+            {hasPermission('create:locations') && (
+              <button className="btn btn-primary btn-sm" onClick={handleAdd}>+ Add Location</button>
+            )}
+          </div>
         </div>
 
-        {error && <div className="error">{error}</div>}
-
-        <div className="filter-bar">
-          <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-            <option value="">All Types</option>
-            <option value="store">Stores</option>
-            <option value="warehouse">Warehouses</option>
-          </select>
-        </div>
+        {error && <div className="error" style={{ margin: '16px' }}>{error}</div>}
 
         {loading ? (
           <div className="loading">Loading locations...</div>
         ) : locations.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6c757d' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏪</div>
-            <h3 style={{ marginBottom: '8px', color: '#343a40' }}>No locations yet</h3>
-            <p style={{ marginBottom: '20px' }}>
+          <div className="empty-state">
+            <div className="empty-state-icon">🏪</div>
+            <h3>No locations yet</h3>
+            <p>
               {filter
                 ? `No ${filter}s found. Try a different filter.`
                 : 'Add your first store or warehouse to start tracking inventory.'}
@@ -158,25 +170,26 @@ export default function Locations() {
                 <tr key={location.id}>
                   <td><strong>{location.name}</strong></td>
                   <td>{getTypeBadge(location.type)}</td>
-                  <td>{location.address || <span style={{ color: '#adb5bd' }}>—</span>}</td>
+                  <td>{location.address || <span className="td-muted">—</span>}</td>
                   <td>
-                    {hasPermission('edit:locations') && (
-                      <button
-                        className="btn btn-secondary"
-                        style={{ marginRight: '8px' }}
-                        onClick={() => handleEdit(location)}
-                      >
-                        Edit
-                      </button>
-                    )}
-                    {hasPermission('delete:locations') && (
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => handleDelete(location.id, location.name)}
-                      >
-                        Delete
-                      </button>
-                    )}
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      {hasPermission('edit:locations') && (
+                        <button
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => handleEdit(location)}
+                        >
+                          Edit
+                        </button>
+                      )}
+                      {hasPermission('delete:locations') && (
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => handleDelete(location.id, location.name)}
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -192,46 +205,48 @@ export default function Locations() {
               <h2>{editingLocation ? 'Edit Location' : 'Add Location'}</h2>
               <button className="close-btn" onClick={() => setShowModal(false)}>&times;</button>
             </div>
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label>Name *</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  placeholder="e.g. Main Warehouse, Downtown Store"
-                />
-              </div>
-              <div className="form-group">
-                <label>Type *</label>
-                <select
-                  value={formData.type}
-                  onChange={e => setFormData({ ...formData, type: e.target.value as 'store' | 'warehouse' })}
-                  required
-                >
-                  <option value="store">Store</option>
-                  <option value="warehouse">Warehouse</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Address</label>
-                <textarea
-                  value={formData.address}
-                  onChange={e => setFormData({ ...formData, address: e.target.value })}
-                  rows={2}
-                  placeholder="Optional address"
-                />
-              </div>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {submitting ? 'Saving...' : editingLocation ? 'Update' : 'Create'}
-                </button>
-              </div>
-            </form>
+            <div className="modal-body">
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label>Name *</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    required
+                    placeholder="e.g. Main Warehouse, Downtown Store"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Type *</label>
+                  <select
+                    value={formData.type}
+                    onChange={e => setFormData({ ...formData, type: e.target.value as 'store' | 'warehouse' })}
+                    required
+                  >
+                    <option value="store">Store</option>
+                    <option value="warehouse">Warehouse</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Address</label>
+                  <textarea
+                    value={formData.address}
+                    onChange={e => setFormData({ ...formData, address: e.target.value })}
+                    rows={2}
+                    placeholder="Optional address"
+                  />
+                </div>
+                <div className="modal-footer" style={{ padding: '0', marginTop: '8px' }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary" disabled={submitting}>
+                    {submitting ? 'Saving...' : editingLocation ? 'Update' : 'Create'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

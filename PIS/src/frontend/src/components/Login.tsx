@@ -62,7 +62,6 @@ export default function Login() {
         name: regName,
       })
       setRegisterSuccess(true)
-      // Auto-switch to login and pre-fill email
       setTimeout(() => {
         setEmail(regEmail)
         setRegisterSuccess(false)
@@ -87,8 +86,9 @@ export default function Login() {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>📦 PIS</h1>
-          <p>Product Information System</p>
+          <div className="login-logo-icon">📦</div>
+          <h1>Welcome back</h1>
+          <p>Sign in to your PIS account</p>
         </div>
 
         <div className="login-tabs">
@@ -120,7 +120,7 @@ export default function Login() {
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@gmail.com"
+                  placeholder="you@example.com"
                   required
                   disabled={isLoading}
                 />
@@ -188,7 +188,7 @@ export default function Login() {
                   id="reg-email"
                   value={regEmail}
                   onChange={(e) => setRegEmail(e.target.value)}
-                  placeholder="you@gmail.com"
+                  placeholder="you@example.com"
                   required
                   disabled={registerSuccess}
                 />

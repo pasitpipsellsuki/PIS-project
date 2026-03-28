@@ -36,7 +36,6 @@ export default function Teams() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  // Create/Edit modal
   const [showModal, setShowModal] = useState(false)
   const [editingTeam, setEditingTeam] = useState<TeamRecord | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -47,7 +46,6 @@ export default function Teams() {
     lead_user_id: '',
   })
 
-  // Members drawer
   const [selectedTeam, setSelectedTeam] = useState<(TeamRecord & { members?: TeamMember[] }) | null>(null)
   const [showMembersDrawer, setShowMembersDrawer] = useState(false)
   const [addMemberId, setAddMemberId] = useState('')
@@ -189,38 +187,31 @@ export default function Teams() {
 
   return (
     <div>
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2>Teams</h2>
-          <button className="btn btn-primary" onClick={handleAdd}>+ New Team</button>
-        </div>
+      {error && <div className="error">{error}</div>}
 
-        {error && <div className="error">{error}</div>}
-
-        {loading ? (
-          <div className="loading">Loading teams...</div>
-        ) : teams.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6c757d' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏢</div>
-            <h3 style={{ marginBottom: '8px', color: '#343a40' }}>No teams yet</h3>
-            <p style={{ marginBottom: '20px' }}>Get started by creating your first team.</p>
+      {loading ? (
+        <div className="loading">Loading teams...</div>
+      ) : teams.length === 0 ? (
+        <div className="card">
+          <div className="empty-state">
+            <div className="empty-state-icon">🏢</div>
+            <h3>No teams yet</h3>
+            <p>Get started by creating your first team.</p>
             <button className="btn btn-primary" onClick={handleAdd}>+ Create First Team</button>
           </div>
-        ) : (
+        </div>
+      ) : (
+        <>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+            <button className="btn btn-primary btn-sm" onClick={handleAdd}>+ New Team</button>
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
             {teams.map(team => (
-              <div
-                key={team.id}
-                style={{
-                  border: '1px solid #dee2e6',
-                  borderRadius: '8px',
-                  padding: '20px',
-                  background: '#fff',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                  <h3 style={{ margin: 0, fontSize: '16px', color: '#212529' }}>{team.name}</h3>
+              <div key={team.id} className="card" style={{ margin: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+                  <h3 style={{ margin: 0, fontSize: '15px', fontWeight: '700', color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>
+                    {team.name}
+                  </h3>
                   <div style={{ display: 'flex', gap: '6px' }}>
                     <button className="btn btn-secondary btn-sm" onClick={() => handleEdit(team)}>Edit</button>
                     {isAdmin && (
@@ -230,30 +221,21 @@ export default function Teams() {
                 </div>
 
                 {team.description && (
-                  <p style={{ margin: '0 0 12px 0', fontSize: '13px', color: '#6c757d' }}>{team.description}</p>
+                  <p style={{ margin: '0 0 12px 0', fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                    {team.description}
+                  </p>
                 )}
 
-                <div style={{ fontSize: '13px', color: '#495057', marginBottom: '12px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '14px' }}>
                   {team.lead_name ? (
-                    <div>
-                      <strong>Lead:</strong> {team.lead_name}
-                    </div>
+                    <div><strong>Lead:</strong> {team.lead_name}</div>
                   ) : (
-                    <div style={{ color: '#adb5bd' }}>No team lead assigned</div>
+                    <div style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>No team lead assigned</div>
                   )}
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span
-                    className="badge"
-                    style={{
-                      background: '#e9ecef',
-                      color: '#495057',
-                      padding: '4px 10px',
-                      borderRadius: '20px',
-                      fontSize: '12px',
-                    }}
-                  >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '12px', borderTop: '1px solid var(--border-light)' }}>
+                  <span className="badge badge-gray">
                     {team.member_count} {team.member_count === 1 ? 'member' : 'members'}
                   </span>
                   <button
@@ -266,8 +248,8 @@ export default function Teams() {
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </>
+      )}
 
       {/* Create/Edit Team Modal */}
       {showModal && (
@@ -277,54 +259,56 @@ export default function Teams() {
               <h2>{editingTeam ? 'Edit Team' : 'New Team'}</h2>
               <button className="close-btn" onClick={() => setShowModal(false)}>&times;</button>
             </div>
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label>Team Name *</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  placeholder="e.g. Warehouse Team"
-                />
-              </div>
-              <div className="form-group">
-                <label>Description</label>
-                <textarea
-                  value={formData.description}
-                  onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                  placeholder="Optional description"
-                />
-              </div>
-              {allUsers.length > 0 && (
+            <div className="modal-body">
+              <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                  <label>Team Lead</label>
-                  <select
-                    value={formData.lead_user_id}
-                    onChange={e => setFormData({ ...formData, lead_user_id: e.target.value })}
-                  >
-                    <option value="">— No lead assigned —</option>
-                    {allUsers.map(u => (
-                      <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
-                    ))}
-                  </select>
+                  <label>Team Name *</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    required
+                    placeholder="e.g. Warehouse Team"
+                  />
                 </div>
-              )}
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {submitting ? 'Saving...' : editingTeam ? 'Update Team' : 'Create Team'}
-                </button>
-              </div>
-            </form>
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea
+                    value={formData.description}
+                    onChange={e => setFormData({ ...formData, description: e.target.value })}
+                    rows={3}
+                    placeholder="Optional description"
+                  />
+                </div>
+                {allUsers.length > 0 && (
+                  <div className="form-group">
+                    <label>Team Lead</label>
+                    <select
+                      value={formData.lead_user_id}
+                      onChange={e => setFormData({ ...formData, lead_user_id: e.target.value })}
+                    >
+                      <option value="">— No lead assigned —</option>
+                      {allUsers.map(u => (
+                        <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                <div className="modal-footer" style={{ padding: '0', marginTop: '8px' }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary" disabled={submitting}>
+                    {submitting ? 'Saving...' : editingTeam ? 'Update Team' : 'Create Team'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Members Drawer/Modal */}
+      {/* Members Modal */}
       {showMembersDrawer && selectedTeam && (
         <div className="modal-overlay" onClick={() => setShowMembersDrawer(false)}>
           <div className="modal" style={{ maxWidth: '550px' }} onClick={e => e.stopPropagation()}>
@@ -332,77 +316,86 @@ export default function Teams() {
               <h2>Members — {selectedTeam.name}</h2>
               <button className="close-btn" onClick={() => setShowMembersDrawer(false)}>&times;</button>
             </div>
-
-            {membersLoading ? (
-              <div className="loading">Loading members...</div>
-            ) : (
-              <>
-                {/* Current members */}
-                {currentMembers.length === 0 ? (
-                  <p style={{ color: '#6c757d', textAlign: 'center', padding: '20px 0' }}>No members in this team yet.</p>
-                ) : (
-                  <table style={{ marginBottom: '20px' }}>
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentMembers.map((m: TeamMember) => (
-                        <tr key={m.id}>
-                          <td><strong>{m.name}</strong></td>
-                          <td>{m.email}</td>
-                          <td>
-                            <span className="badge badge-info" style={{ fontSize: '11px' }}>{m.role}</span>
-                          </td>
-                          <td>
-                            <button
-                              className="btn btn-danger btn-sm"
-                              onClick={() => handleRemoveMember(m.id, m.name)}
-                            >
-                              Remove
-                            </button>
-                          </td>
+            <div className="modal-body">
+              {membersLoading ? (
+                <div className="loading">Loading members...</div>
+              ) : (
+                <>
+                  {currentMembers.length === 0 ? (
+                    <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '20px 0', fontSize: '13.5px' }}>No members in this team yet.</p>
+                  ) : (
+                    <table style={{ marginBottom: '20px' }}>
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Role</th>
+                          <th></th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-
-                {/* Add member */}
-                {availableToAdd.length > 0 && (
-                  <div style={{ borderTop: '1px solid #dee2e6', paddingTop: '16px' }}>
-                    <label style={{ fontWeight: 600, display: 'block', marginBottom: '8px' }}>Add Member</label>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <select
-                        value={addMemberId}
-                        onChange={e => setAddMemberId(e.target.value)}
-                        style={{ flex: 1, padding: '8px', borderRadius: '4px', border: '1px solid #ced4da' }}
-                      >
-                        <option value="">— Select a user —</option>
-                        {availableToAdd.map(u => (
-                          <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+                      </thead>
+                      <tbody>
+                        {currentMembers.map((m: TeamMember) => (
+                          <tr key={m.id}>
+                            <td><strong>{m.name}</strong></td>
+                            <td className="td-muted">{m.email}</td>
+                            <td>
+                              <span className="badge badge-info" style={{ fontSize: '11px' }}>{m.role}</span>
+                            </td>
+                            <td>
+                              <button
+                                className="btn btn-danger btn-sm"
+                                onClick={() => handleRemoveMember(m.id, m.name)}
+                              >
+                                Remove
+                              </button>
+                            </td>
+                          </tr>
                         ))}
-                      </select>
-                      <button
-                        className="btn btn-primary"
-                        onClick={handleAddMember}
-                        disabled={!addMemberId}
-                      >
-                        Add
-                      </button>
-                    </div>
-                  </div>
-                )}
+                      </tbody>
+                    </table>
+                  )}
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-                  <button className="btn btn-secondary" onClick={() => setShowMembersDrawer(false)}>Close</button>
-                </div>
-              </>
-            )}
+                  {availableToAdd.length > 0 && (
+                    <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
+                      <label style={{ fontWeight: '600', display: 'block', marginBottom: '8px', fontSize: '12.5px', color: 'var(--text-secondary)' }}>Add Member</label>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <select
+                          value={addMemberId}
+                          onChange={e => setAddMemberId(e.target.value)}
+                          style={{
+                            flex: 1,
+                            padding: '8px 12px',
+                            borderRadius: 'var(--radius-sm)',
+                            border: '1.5px solid var(--border)',
+                            fontSize: '13px',
+                            fontFamily: 'inherit',
+                            color: 'var(--text-primary)',
+                            background: 'var(--surface)',
+                            outline: 'none',
+                          }}
+                        >
+                          <option value="">— Select a user —</option>
+                          {availableToAdd.map(u => (
+                            <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+                          ))}
+                        </select>
+                        <button
+                          className="btn btn-primary"
+                          onClick={handleAddMember}
+                          disabled={!addMemberId}
+                        >
+                          Add
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+                    <button className="btn btn-secondary" onClick={() => setShowMembersDrawer(false)}>Close</button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -18,11 +18,11 @@ interface UserRecord {
 
 const ROLE_OPTIONS = ['admin', 'manager', 'staff', 'viewer']
 
-const ROLE_BADGE_COLORS: Record<string, string> = {
-  admin: '#dc3545',
-  manager: '#fd7e14',
-  staff: '#198754',
-  viewer: '#6c757d',
+const ROLE_BADGE_CLASS: Record<string, string> = {
+  admin: 'badge-danger',
+  manager: 'badge-warning',
+  staff: 'badge-success',
+  viewer: 'badge-gray',
 }
 
 export default function Users() {
@@ -112,20 +112,21 @@ export default function Users() {
 
   return (
     <div>
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2>User Management</h2>
-          <button className="btn btn-primary" onClick={() => setShowModal(true)}>+ Invite User</button>
+      <div className="table-container">
+        <div className="table-toolbar">
+          <span className="table-title">All Users ({users.length})</span>
+          <button className="btn btn-primary btn-sm" onClick={() => setShowModal(true)}>+ Invite User</button>
         </div>
 
-        {error && <div className="error">{error}</div>}
+        {error && <div className="error" style={{ margin: '16px' }}>{error}</div>}
 
         {loading ? (
           <div className="loading">Loading users...</div>
         ) : users.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6c757d' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>👥</div>
-            <h3 style={{ marginBottom: '8px', color: '#343a40' }}>No users found</h3>
+          <div className="empty-state">
+            <div className="empty-state-icon">👥</div>
+            <h3>No users found</h3>
+            <p>Invite users to get started.</p>
           </div>
         ) : (
           <table>
@@ -144,58 +145,56 @@ export default function Users() {
             <tbody>
               {users.map(u => (
                 <tr key={u.id} style={{ opacity: u.is_active ? 1 : 0.6 }}>
-                  <td><strong>{u.name}</strong>{u.id === currentUser?.id && <span style={{ marginLeft: 6, fontSize: 11, color: '#6c757d' }}>(you)</span>}</td>
-                  <td>{u.email}</td>
                   <td>
-                    <span
-                      className="badge"
-                      style={{
-                        background: ROLE_BADGE_COLORS[u.role] || '#6c757d',
-                        color: '#fff',
-                        padding: '3px 8px',
-                        borderRadius: '4px',
-                        fontSize: '12px',
-                      }}
-                    >
+                    <strong>{u.name}</strong>
+                    {u.id === currentUser?.id && (
+                      <span className="badge badge-gray" style={{ marginLeft: 8, fontSize: '10px' }}>you</span>
+                    )}
+                  </td>
+                  <td className="td-muted">{u.email}</td>
+                  <td>
+                    <span className={`badge ${ROLE_BADGE_CLASS[u.role] || 'badge-gray'}`}>
                       {u.role}
                     </span>
                   </td>
-                  <td>{u.team_name || <span style={{ color: '#adb5bd' }}>—</span>}</td>
+                  <td>{u.team_name || <span className="td-muted">—</span>}</td>
                   <td>
-                    <span
-                      className="badge"
-                      style={{
-                        background: u.is_active ? '#d4edda' : '#f8d7da',
-                        color: u.is_active ? '#155724' : '#721c24',
-                        padding: '3px 8px',
-                        borderRadius: '4px',
-                        fontSize: '12px',
-                      }}
-                    >
+                    <span className={`badge ${u.is_active ? 'badge-success' : 'badge-danger'}`}>
                       {u.is_active ? 'Active' : 'Inactive'}
                     </span>
                   </td>
-                  <td>{formatDate(u.last_login)}</td>
-                  <td>{formatDate(u.created_at)}</td>
+                  <td className="td-muted">{formatDate(u.last_login)}</td>
+                  <td className="td-muted">{formatDate(u.created_at)}</td>
                   <td>
-                    <select
-                      value={u.role}
-                      onChange={e => handleRoleChange(u.id, e.target.value)}
-                      style={{ marginRight: '8px', padding: '4px 8px', borderRadius: '4px', border: '1px solid #ced4da', fontSize: '13px' }}
-                      disabled={u.id === currentUser?.id}
-                    >
-                      {ROLE_OPTIONS.map(r => (
-                        <option key={r} value={r}>{r}</option>
-                      ))}
-                    </select>
-                    <button
-                      className={`btn btn-sm ${u.is_active ? 'btn-danger' : 'btn-secondary'}`}
-                      onClick={() => handleStatusToggle(u.id, u.is_active)}
-                      disabled={u.id === currentUser?.id}
-                      title={u.id === currentUser?.id ? 'Cannot change your own status' : ''}
-                    >
-                      {u.is_active ? 'Deactivate' : 'Activate'}
-                    </button>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <select
+                        value={u.role}
+                        onChange={e => handleRoleChange(u.id, e.target.value)}
+                        style={{
+                          padding: '5px 8px',
+                          borderRadius: 'var(--radius-sm)',
+                          border: '1.5px solid var(--border)',
+                          fontSize: '12px',
+                          fontFamily: 'inherit',
+                          color: 'var(--text-primary)',
+                          background: 'var(--surface)',
+                          outline: 'none',
+                        }}
+                        disabled={u.id === currentUser?.id}
+                      >
+                        {ROLE_OPTIONS.map(r => (
+                          <option key={r} value={r}>{r}</option>
+                        ))}
+                      </select>
+                      <button
+                        className={`btn btn-sm ${u.is_active ? 'btn-danger' : 'btn-secondary'}`}
+                        onClick={() => handleStatusToggle(u.id, u.is_active)}
+                        disabled={u.id === currentUser?.id}
+                        title={u.id === currentUser?.id ? 'Cannot change your own status' : ''}
+                      >
+                        {u.is_active ? 'Deactivate' : 'Activate'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -211,62 +210,64 @@ export default function Users() {
               <h2>Invite New User</h2>
               <button className="close-btn" onClick={() => setShowModal(false)}>&times;</button>
             </div>
-            <form onSubmit={handleInviteSubmit}>
-              <div className="form-group">
-                <label>Full Name *</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  placeholder="e.g. Jane Smith"
-                />
-              </div>
-              <div className="form-group">
-                <label>Email *</label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={e => setFormData({ ...formData, email: e.target.value })}
-                  required
-                  placeholder="jane@example.com"
-                />
-              </div>
-              <div className="form-group">
-                <label>Temporary Password *</label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={e => setFormData({ ...formData, password: e.target.value })}
-                  required
-                  minLength={6}
-                  placeholder="At least 6 characters"
-                />
-              </div>
-              <div className="form-group">
-                <label>Role *</label>
-                <select
-                  value={formData.role}
-                  onChange={e => setFormData({ ...formData, role: e.target.value })}
-                  required
-                >
-                  {ROLE_OPTIONS.map(r => (
-                    <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
-                  ))}
-                </select>
-              </div>
-              <div style={{ background: '#e8f4fd', padding: '10px 14px', borderRadius: '6px', marginBottom: '16px', fontSize: '13px', color: '#0c5460' }}>
-                The user will be able to log in immediately with these credentials.
-              </div>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {submitting ? 'Creating...' : 'Create User'}
-                </button>
-              </div>
-            </form>
+            <div className="modal-body">
+              <form onSubmit={handleInviteSubmit}>
+                <div className="form-group">
+                  <label>Full Name *</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    required
+                    placeholder="e.g. Jane Smith"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Email *</label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    required
+                    placeholder="jane@example.com"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Temporary Password *</label>
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={e => setFormData({ ...formData, password: e.target.value })}
+                    required
+                    minLength={6}
+                    placeholder="At least 6 characters"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Role *</label>
+                  <select
+                    value={formData.role}
+                    onChange={e => setFormData({ ...formData, role: e.target.value })}
+                    required
+                  >
+                    {ROLE_OPTIONS.map(r => (
+                      <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
+                    ))}
+                  </select>
+                </div>
+                <div style={{ background: 'var(--info-bg)', padding: '10px 14px', borderRadius: 'var(--radius-sm)', marginBottom: '16px', fontSize: '13px', color: 'var(--info-text)' }}>
+                  The user will be able to log in immediately with these credentials.
+                </div>
+                <div className="modal-footer" style={{ padding: '0', marginTop: '8px' }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary" disabled={submitting}>
+                    {submitting ? 'Creating...' : 'Create User'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

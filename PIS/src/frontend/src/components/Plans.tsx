@@ -389,29 +389,21 @@ export default function Plans() {
 
   const getPurchaseTypeBadge = (type: string) => {
     if (type === 'subscription') {
-      return (
-        <span className="badge" style={{ background: '#7c3aed', color: '#fff' }}>
-          Subscription
-        </span>
-      )
+      return <span className="badge badge-digital">Subscription</span>
     }
-    return (
-      <span className="badge" style={{ background: '#2563eb', color: '#fff' }}>
-        One-Time
-      </span>
-    )
+    return <span className="badge badge-physical">One-Time</span>
   }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <span className="badge" style={{ background: '#16a34a', color: '#fff' }}>Active</span>
+        return <span className="badge badge-success">Active</span>
       case 'expired':
-        return <span className="badge" style={{ background: '#dc2626', color: '#fff' }}>Expired</span>
+        return <span className="badge badge-danger">Expired</span>
       case 'cancelled':
-        return <span className="badge" style={{ background: '#6b7280', color: '#fff' }}>Cancelled</span>
+        return <span className="badge badge-gray">Cancelled</span>
       default:
-        return <span className="badge">{status}</span>
+        return <span className="badge badge-gray">{status}</span>
     }
   }
 
@@ -423,28 +415,21 @@ export default function Plans() {
   return (
     <div>
       {/* Plans List */}
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <div>
-            <h2 style={{ marginBottom: '4px' }}>Plans — Quota Management</h2>
-            <p style={{ color: '#6c757d', fontSize: '13px', margin: 0 }}>
-              Group digital products into plans, set quota rules, and track customer usage.
-            </p>
-          </div>
+      <div className="table-container">
+        <div className="table-toolbar">
+          <span className="table-title">QMS Plans ({plans.length})</span>
           {isManagerOrAbove && (
-            <button className="btn btn-primary" onClick={handleCreatePlan}>+ New Plan</button>
+            <button className="btn btn-primary btn-sm" onClick={handleCreatePlan}>+ New Plan</button>
           )}
         </div>
 
         {loading ? (
           <div className="loading">Loading plans...</div>
         ) : plans.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6c757d' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>📋</div>
-            <h3 style={{ marginBottom: '8px', color: '#343a40' }}>No plans yet</h3>
-            <p style={{ marginBottom: '20px' }}>
-              Create a plan to group digital products and manage customer quotas.
-            </p>
+          <div className="empty-state">
+            <div className="empty-state-icon">💎</div>
+            <h3>No plans yet</h3>
+            <p>Create a plan to group digital products and manage customer quotas.</p>
             {isManagerOrAbove && (
               <button className="btn btn-primary" onClick={handleCreatePlan}>
                 + Create First Plan
@@ -469,58 +454,53 @@ export default function Plans() {
                   key={plan.id}
                   style={{
                     cursor: 'pointer',
-                    background: selectedPlan?.plan.id === plan.id ? '#f0f7ff' : undefined,
+                    background: selectedPlan?.plan.id === plan.id ? 'var(--primary-light)' : undefined,
                   }}
                   onClick={() => openPlanDetail(plan)}
                 >
                   <td>
-                    <strong style={{ color: '#2563eb' }}>{plan.name}</strong>
+                    <strong style={{ color: 'var(--primary)' }}>{plan.name}</strong>
                     {plan.description && (
-                      <div style={{ fontSize: '12px', color: '#6c757d', marginTop: '2px' }}>
-                        {plan.description}
-                      </div>
+                      <div className="td-muted" style={{ marginTop: '2px' }}>{plan.description}</div>
                     )}
                   </td>
                   <td>{getPurchaseTypeBadge(plan.purchase_type)}</td>
                   <td>
-                    <span style={{ fontWeight: 'bold' }}>{plan.item_count}</span>
-                    <span style={{ color: '#6c757d', marginLeft: '4px', fontSize: '12px' }}>digital SKUs</span>
+                    <strong>{plan.item_count}</strong>
+                    <span className="td-muted" style={{ marginLeft: '4px' }}>SKUs</span>
                   </td>
                   <td>
-                    <span style={{ fontWeight: 'bold' }}>{plan.customer_count}</span>
-                    <span style={{ color: '#6c757d', marginLeft: '4px', fontSize: '12px' }}>customers</span>
+                    <strong>{plan.customer_count}</strong>
+                    <span className="td-muted" style={{ marginLeft: '4px' }}>customers</span>
                   </td>
                   <td>
                     {plan.is_active
-                      ? <span className="badge" style={{ background: '#16a34a', color: '#fff' }}>Active</span>
-                      : <span className="badge" style={{ background: '#6b7280', color: '#fff' }}>Inactive</span>
+                      ? <span className="badge badge-success">Active</span>
+                      : <span className="badge badge-gray">Inactive</span>
                     }
                   </td>
                   <td onClick={e => e.stopPropagation()}>
                     {isManagerOrAbove && (
-                      <>
+                      <div style={{ display: 'flex', gap: '6px' }}>
                         <button
-                          className="btn btn-secondary"
-                          style={{ marginRight: '6px', fontSize: '12px', padding: '3px 10px' }}
+                          className="btn btn-secondary btn-sm"
                           onClick={(e) => handleEditPlan(plan, e)}
                         >
                           Edit
                         </button>
                         <button
-                          className="btn btn-secondary"
-                          style={{ marginRight: '6px', fontSize: '12px', padding: '3px 10px' }}
+                          className="btn btn-secondary btn-sm"
                           onClick={(e) => handleToggleActive(plan, e)}
                         >
                           {plan.is_active ? 'Deactivate' : 'Activate'}
                         </button>
                         <button
-                          className="btn btn-danger"
-                          style={{ fontSize: '12px', padding: '3px 10px' }}
+                          className="btn btn-danger btn-sm"
                           onClick={(e) => handleDeletePlan(plan, e)}
                         >
                           Delete
                         </button>
-                      </>
+                      </div>
                     )}
                   </td>
                 </tr>
@@ -532,17 +512,17 @@ export default function Plans() {
 
       {/* Plan Detail */}
       {selectedPlan && (
-        <div className="card" style={{ marginTop: '20px' }}>
+        <div className="card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
             <div>
-              <h3 style={{ marginBottom: '4px' }}>
+              <h3 style={{ marginBottom: '4px', fontSize: '16px', fontWeight: '700', letterSpacing: '-0.3px' }}>
                 {selectedPlan.plan.name}
                 <span style={{ marginLeft: '10px' }}>
                   {getPurchaseTypeBadge(selectedPlan.plan.purchase_type)}
                 </span>
               </h3>
               {selectedPlan.plan.description && (
-                <p style={{ color: '#6c757d', fontSize: '13px', margin: 0 }}>{selectedPlan.plan.description}</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '13px', margin: 0 }}>{selectedPlan.plan.description}</p>
               )}
             </div>
             <button className="btn btn-secondary btn-sm" onClick={() => setSelectedPlan(null)}>
@@ -552,33 +532,33 @@ export default function Plans() {
 
           {/* Stats row */}
           {planStats && (
-            <div style={{ display: 'flex', gap: '16px', marginBottom: '20px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
               {[
-                { label: 'Total Customers', value: planStats.total_customers, color: '#2563eb' },
-                { label: 'Active', value: planStats.active_customers, color: '#16a34a' },
-                { label: 'Expired', value: planStats.expired_customers, color: '#dc2626' },
-                { label: 'Avg Quota Used', value: planStats.avg_quota_used !== null ? Math.round(planStats.avg_quota_used) : '-', color: '#7c3aed' },
+                { label: 'Total Customers', value: planStats.total_customers },
+                { label: 'Active', value: planStats.active_customers },
+                { label: 'Expired', value: planStats.expired_customers },
+                { label: 'Avg Quota Used', value: planStats.avg_quota_used !== null ? Math.round(planStats.avg_quota_used) : '—' },
               ].map(stat => (
                 <div
                   key={stat.label}
                   style={{
-                    background: '#f8f9fa',
-                    border: '1px solid #e9ecef',
-                    borderRadius: '8px',
+                    background: 'var(--surface-2)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
                     padding: '10px 18px',
                     textAlign: 'center',
                     minWidth: '110px',
                   }}
                 >
-                  <div style={{ fontSize: '22px', fontWeight: 'bold', color: stat.color }}>{stat.value}</div>
-                  <div style={{ fontSize: '11px', color: '#6c757d', marginTop: '2px' }}>{stat.label}</div>
+                  <div style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>{stat.value}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', fontWeight: '500' }}>{stat.label}</div>
                 </div>
               ))}
             </div>
           )}
 
           {/* Tabs */}
-          <div style={{ display: 'flex', gap: '0', borderBottom: '2px solid #e9ecef', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', borderBottom: '2px solid var(--border)', marginBottom: '20px' }}>
             {(['products', 'quota', 'customers'] as const).map(tab => (
               <button
                 key={tab}
@@ -588,12 +568,13 @@ export default function Plans() {
                   border: 'none',
                   background: 'none',
                   cursor: 'pointer',
-                  fontWeight: activeTab === tab ? 'bold' : 'normal',
-                  color: activeTab === tab ? '#2563eb' : '#6c757d',
-                  borderBottom: activeTab === tab ? '2px solid #2563eb' : '2px solid transparent',
+                  fontWeight: activeTab === tab ? '700' : '500',
+                  color: activeTab === tab ? 'var(--primary)' : 'var(--text-muted)',
+                  borderBottom: activeTab === tab ? '2px solid var(--primary)' : '2px solid transparent',
                   marginBottom: '-2px',
-                  fontSize: '14px',
-                  textTransform: 'capitalize',
+                  fontSize: '13.5px',
+                  fontFamily: 'inherit',
+                  transition: 'color 0.15s',
                 }}
               >
                 {tab === 'products' ? `Products (${selectedPlan.items.length})` :
@@ -607,11 +588,21 @@ export default function Plans() {
           {activeTab === 'products' && (
             <div>
               {isManagerOrAbove && (
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', alignItems: 'center' }}>
                   <select
                     value={selectedProductId}
                     onChange={e => setSelectedProductId(e.target.value)}
-                    style={{ flex: 1, padding: '6px 10px', borderRadius: '4px', border: '1px solid #ced4da' }}
+                    style={{
+                      flex: 1,
+                      padding: '7px 12px',
+                      borderRadius: 'var(--radius-sm)',
+                      border: '1.5px solid var(--border)',
+                      fontSize: '13px',
+                      fontFamily: 'inherit',
+                      color: 'var(--text-primary)',
+                      background: 'var(--surface)',
+                      outline: 'none',
+                    }}
                   >
                     <option value="">— Select a digital product to add —</option>
                     {availableProducts.map(p => (
@@ -621,7 +612,7 @@ export default function Plans() {
                     ))}
                   </select>
                   <button
-                    className="btn btn-primary"
+                    className="btn btn-primary btn-sm"
                     onClick={handleAddItem}
                     disabled={!selectedProductId}
                   >
@@ -630,12 +621,12 @@ export default function Plans() {
                 </div>
               )}
               {availableProducts.length === 0 && selectedPlan.items.length === 0 && (
-                <div style={{ color: '#6c757d', fontSize: '13px', marginBottom: '12px' }}>
+                <div style={{ color: 'var(--text-muted)', fontSize: '13px', marginBottom: '12px', padding: '12px', background: 'var(--surface-2)', borderRadius: 'var(--radius-sm)' }}>
                   No digital products available. Create digital products first in the Products section.
                 </div>
               )}
               {selectedPlan.items.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '30px', color: '#6c757d' }}>
+                <div style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)', fontSize: '13.5px' }}>
                   No products in this plan yet. Add digital products above.
                 </div>
               ) : (
@@ -656,15 +647,14 @@ export default function Plans() {
                         <td><strong>{item.product_name}</strong></td>
                         <td>
                           {item.category && (
-                            <span className="badge badge-success">{item.category}</span>
+                            <span className="badge badge-gray">{item.category}</span>
                           )}
                         </td>
                         <td>${item.price?.toFixed(2) || '0.00'}</td>
                         {isManagerOrAbove && (
                           <td>
                             <button
-                              className="btn btn-danger"
-                              style={{ fontSize: '12px', padding: '3px 10px' }}
+                              className="btn btn-danger btn-sm"
                               onClick={() => handleRemoveItem(item)}
                             >
                               Remove
@@ -683,18 +673,18 @@ export default function Plans() {
           {activeTab === 'quota' && (
             <div>
               {selectedPlan.quota_rule ? (
-                <div style={{ marginBottom: '20px', background: '#f0f7ff', borderRadius: '8px', padding: '16px', border: '1px solid #bfdbfe' }}>
-                  <h4 style={{ marginBottom: '8px', color: '#1d4ed8' }}>Current Quota Rule</h4>
-                  <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                <div style={{ marginBottom: '20px', background: 'var(--info-bg)', borderRadius: 'var(--radius)', padding: '16px', border: '1px solid #bfdbfe' }}>
+                  <h4 style={{ marginBottom: '10px', color: 'var(--info-text)', fontSize: '13.5px', fontWeight: '700' }}>Current Quota Rule</h4>
+                  <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
                     <div>
-                      <span style={{ fontSize: '12px', color: '#6c757d' }}>Type</span>
-                      <div style={{ fontWeight: 'bold' }}>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Type</div>
+                      <div style={{ fontWeight: '700', fontSize: '14px', color: 'var(--text-primary)', marginTop: '2px' }}>
                         {selectedPlan.quota_rule.rule_type === 'download_limit' ? 'Download Limit' : 'Access Duration'}
                       </div>
                     </div>
                     <div>
-                      <span style={{ fontSize: '12px', color: '#6c757d' }}>Value</span>
-                      <div style={{ fontWeight: 'bold' }}>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Value</div>
+                      <div style={{ fontWeight: '700', fontSize: '14px', color: 'var(--text-primary)', marginTop: '2px' }}>
                         {selectedPlan.quota_rule.value}
                         {selectedPlan.quota_rule.unit ? ` ${selectedPlan.quota_rule.unit}` : ' downloads'}
                       </div>
@@ -702,8 +692,8 @@ export default function Plans() {
                   </div>
                   {isManagerOrAbove && (
                     <button
-                      className="btn btn-danger"
-                      style={{ marginTop: '12px', fontSize: '12px' }}
+                      className="btn btn-danger btn-sm"
+                      style={{ marginTop: '12px' }}
                       onClick={handleRemoveQuotaRule}
                     >
                       Remove Rule
@@ -711,14 +701,14 @@ export default function Plans() {
                   )}
                 </div>
               ) : (
-                <div style={{ color: '#6c757d', marginBottom: '16px', padding: '12px', background: '#f8f9fa', borderRadius: '6px' }}>
+                <div style={{ color: 'var(--text-muted)', marginBottom: '16px', padding: '12px 16px', background: 'var(--surface-2)', borderRadius: 'var(--radius-sm)', fontSize: '13.5px' }}>
                   No quota rule set for this plan.
                 </div>
               )}
 
               {isManagerOrAbove && (
                 <form onSubmit={handleSetQuotaRule} style={{ maxWidth: '400px' }}>
-                  <h4 style={{ marginBottom: '12px' }}>
+                  <h4 style={{ marginBottom: '14px', fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)' }}>
                     {selectedPlan.quota_rule ? 'Update Quota Rule' : 'Set Quota Rule'}
                   </h4>
                   <div className="form-group">
@@ -741,7 +731,7 @@ export default function Plans() {
                       required
                       placeholder={quotaForm.rule_type === 'download_limit' ? 'e.g. 5' : 'e.g. 30'}
                     />
-                    <small style={{ color: '#666' }}>
+                    <small style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '4px' }}>
                       {quotaForm.rule_type === 'download_limit'
                         ? 'Number of downloads allowed'
                         : 'Duration of access'}
@@ -759,11 +749,9 @@ export default function Plans() {
                       </select>
                     </div>
                   )}
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <button type="submit" className="btn btn-primary" disabled={submitting}>
-                      {submitting ? 'Saving...' : 'Save Rule'}
-                    </button>
-                  </div>
+                  <button type="submit" className="btn btn-primary btn-sm" disabled={submitting}>
+                    {submitting ? 'Saving...' : 'Save Rule'}
+                  </button>
                 </form>
               )}
             </div>
@@ -773,18 +761,18 @@ export default function Plans() {
           {activeTab === 'customers' && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <span style={{ color: '#6c757d', fontSize: '13px' }}>
+                <span className="td-muted">
                   {customers.length} customer{customers.length !== 1 ? 's' : ''} on this plan
                 </span>
                 {isManagerOrAbove && (
-                  <button className="btn btn-primary" onClick={handleAddCustomer}>+ Add Customer</button>
+                  <button className="btn btn-primary btn-sm" onClick={handleAddCustomer}>+ Add Customer</button>
                 )}
               </div>
 
               {customersLoading ? (
                 <div className="loading">Loading customers...</div>
               ) : customers.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '30px', color: '#6c757d' }}>
+                <div style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)', fontSize: '13.5px' }}>
                   No customers on this plan yet.
                 </div>
               ) : (
@@ -804,25 +792,23 @@ export default function Plans() {
                     {customers.map(customer => (
                       <tr key={customer.id}>
                         <td><strong>{customer.customer_name}</strong></td>
-                        <td style={{ color: '#6c757d' }}>{customer.customer_email || '—'}</td>
+                        <td className="td-muted">{customer.customer_email || '—'}</td>
                         <td>{getStatusBadge(customer.status)}</td>
                         <td>{customer.quota_used}</td>
-                        <td style={{ color: '#6c757d', fontSize: '13px' }}>{customer.start_date || '—'}</td>
-                        <td style={{ color: '#6c757d', fontSize: '13px' }}>{customer.end_date || '—'}</td>
+                        <td className="td-muted">{customer.start_date || '—'}</td>
+                        <td className="td-muted">{customer.end_date || '—'}</td>
                         {isManagerOrAbove && (
                           <td>
                             <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                               <button
-                                className="btn btn-secondary"
-                                style={{ fontSize: '11px', padding: '2px 8px' }}
+                                className="btn btn-secondary btn-sm"
                                 onClick={() => handleEditCustomer(customer)}
                               >
                                 Edit
                               </button>
                               {customer.status === 'active' && (
                                 <button
-                                  className="btn btn-secondary"
-                                  style={{ fontSize: '11px', padding: '2px 8px' }}
+                                  className="btn btn-secondary btn-sm"
                                   onClick={() => handleUpdateCustomerStatus(customer, 'expired')}
                                 >
                                   Expire
@@ -830,16 +816,14 @@ export default function Plans() {
                               )}
                               {customer.status !== 'cancelled' && (
                                 <button
-                                  className="btn btn-secondary"
-                                  style={{ fontSize: '11px', padding: '2px 8px' }}
+                                  className="btn btn-secondary btn-sm"
                                   onClick={() => handleUpdateCustomerStatus(customer, 'cancelled')}
                                 >
                                   Cancel
                                 </button>
                               )}
                               <button
-                                className="btn btn-danger"
-                                style={{ fontSize: '11px', padding: '2px 8px' }}
+                                className="btn btn-danger btn-sm"
                                 onClick={() => handleDeleteCustomer(customer)}
                               >
                                 Remove
@@ -865,48 +849,50 @@ export default function Plans() {
               <h2>{editingPlan ? 'Edit Plan' : 'New Plan'}</h2>
               <button className="close-btn" onClick={() => setShowPlanModal(false)}>&times;</button>
             </div>
-            <form onSubmit={handlePlanSubmit}>
-              <div className="form-group">
-                <label>Plan Name *</label>
-                <input
-                  type="text"
-                  value={planForm.name}
-                  onChange={e => setPlanForm({ ...planForm, name: e.target.value })}
-                  required
-                  placeholder="e.g. Netflix Basic, Gift Pack A"
-                />
-              </div>
-              <div className="form-group">
-                <label>Description</label>
-                <textarea
-                  value={planForm.description}
-                  onChange={e => setPlanForm({ ...planForm, description: e.target.value })}
-                  rows={3}
-                  placeholder="Optional description"
-                />
-              </div>
-              <div className="form-group">
-                <label>Purchase Type *</label>
-                <select
-                  value={planForm.purchase_type}
-                  onChange={e => setPlanForm({ ...planForm, purchase_type: e.target.value })}
-                >
-                  <option value="one_time">One-Time Purchase</option>
-                  <option value="subscription">Subscription</option>
-                </select>
-                <small style={{ color: '#666' }}>
-                  One-Time = customer buys once. Subscription = recurring access.
-                </small>
-              </div>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowPlanModal(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {submitting ? 'Saving...' : editingPlan ? 'Update Plan' : 'Create Plan'}
-                </button>
-              </div>
-            </form>
+            <div className="modal-body">
+              <form onSubmit={handlePlanSubmit}>
+                <div className="form-group">
+                  <label>Plan Name *</label>
+                  <input
+                    type="text"
+                    value={planForm.name}
+                    onChange={e => setPlanForm({ ...planForm, name: e.target.value })}
+                    required
+                    placeholder="e.g. Netflix Basic, Gift Pack A"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea
+                    value={planForm.description}
+                    onChange={e => setPlanForm({ ...planForm, description: e.target.value })}
+                    rows={3}
+                    placeholder="Optional description"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Purchase Type *</label>
+                  <select
+                    value={planForm.purchase_type}
+                    onChange={e => setPlanForm({ ...planForm, purchase_type: e.target.value })}
+                  >
+                    <option value="one_time">One-Time Purchase</option>
+                    <option value="subscription">Subscription</option>
+                  </select>
+                  <small style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '4px' }}>
+                    One-Time = customer buys once. Subscription = recurring access.
+                  </small>
+                </div>
+                <div className="modal-footer" style={{ padding: '0', marginTop: '8px' }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowPlanModal(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary" disabled={submitting}>
+                    {submitting ? 'Saving...' : editingPlan ? 'Update Plan' : 'Create Plan'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
@@ -919,51 +905,53 @@ export default function Plans() {
               <h2>{editingCustomer ? 'Edit Customer' : 'Add Customer'}</h2>
               <button className="close-btn" onClick={() => setShowCustomerModal(false)}>&times;</button>
             </div>
-            <form onSubmit={handleCustomerSubmit}>
-              <div className="form-group">
-                <label>Customer Name *</label>
-                <input
-                  type="text"
-                  value={customerForm.customer_name}
-                  onChange={e => setCustomerForm({ ...customerForm, customer_name: e.target.value })}
-                  required
-                  placeholder="Full name"
-                />
-              </div>
-              <div className="form-group">
-                <label>Email</label>
-                <input
-                  type="email"
-                  value={customerForm.customer_email}
-                  onChange={e => setCustomerForm({ ...customerForm, customer_email: e.target.value })}
-                  placeholder="customer@example.com"
-                />
-              </div>
-              <div className="form-group">
-                <label>Start Date</label>
-                <input
-                  type="date"
-                  value={customerForm.start_date}
-                  onChange={e => setCustomerForm({ ...customerForm, start_date: e.target.value })}
-                />
-              </div>
-              <div className="form-group">
-                <label>End Date</label>
-                <input
-                  type="date"
-                  value={customerForm.end_date}
-                  onChange={e => setCustomerForm({ ...customerForm, end_date: e.target.value })}
-                />
-              </div>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '20px' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowCustomerModal(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {submitting ? 'Saving...' : editingCustomer ? 'Update Customer' : 'Add Customer'}
-                </button>
-              </div>
-            </form>
+            <div className="modal-body">
+              <form onSubmit={handleCustomerSubmit}>
+                <div className="form-group">
+                  <label>Customer Name *</label>
+                  <input
+                    type="text"
+                    value={customerForm.customer_name}
+                    onChange={e => setCustomerForm({ ...customerForm, customer_name: e.target.value })}
+                    required
+                    placeholder="Full name"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    value={customerForm.customer_email}
+                    onChange={e => setCustomerForm({ ...customerForm, customer_email: e.target.value })}
+                    placeholder="customer@example.com"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Start Date</label>
+                  <input
+                    type="date"
+                    value={customerForm.start_date}
+                    onChange={e => setCustomerForm({ ...customerForm, start_date: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>End Date</label>
+                  <input
+                    type="date"
+                    value={customerForm.end_date}
+                    onChange={e => setCustomerForm({ ...customerForm, end_date: e.target.value })}
+                  />
+                </div>
+                <div className="modal-footer" style={{ padding: '0', marginTop: '8px' }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowCustomerModal(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary" disabled={submitting}>
+                    {submitting ? 'Saving...' : editingCustomer ? 'Update Customer' : 'Add Customer'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

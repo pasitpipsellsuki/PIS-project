@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import Products from './components/Products'
 import Locations from './components/Locations'
@@ -26,8 +26,19 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
-function Navigation() {
+const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
+  '/': { title: 'Dashboard', subtitle: 'Overview of your inventory and alerts' },
+  '/products': { title: 'Products', subtitle: 'Manage your product catalog' },
+  '/locations': { title: 'Locations', subtitle: 'Stores and warehouses' },
+  '/inventory': { title: 'Inventory', subtitle: 'Stock levels and adjustments' },
+  '/teams': { title: 'Teams', subtitle: 'Manage team members' },
+  '/plans': { title: 'QMS Plans', subtitle: 'Quality management service plans' },
+  '/users': { title: 'Users', subtitle: 'Manage user accounts and roles' },
+}
+
+function Sidebar() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { user, logout, isAdmin, isManagerOrAbove } = useAuth()
   const [lowStockCount, setLowStockCount] = useState(0)
 
@@ -37,64 +48,132 @@ function Navigation() {
       .catch(() => {/* non-critical */})
   }, [])
 
+  const isActive = (path: string) => location.pathname === path
+  const go = (path: string) => navigate(path)
+
+  const avatarInitial = user?.email ? user.email[0].toUpperCase() : '?'
+  const displayName = user?.name || user?.email || 'User'
+
   return (
-    <nav className="navbar">
-      <div className="navbar-content">
-        <h1>📦 Product Information System</h1>
-        <div className="nav-links">
-          <Link to="/" className={location.pathname === '/' ? 'active' : ''}>Dashboard</Link>
-          <Link to="/products" className={location.pathname === '/products' ? 'active' : ''}>Products</Link>
-          <Link to="/locations" className={location.pathname === '/locations' ? 'active' : ''}>Locations</Link>
-          <Link to="/inventory" className={location.pathname === '/inventory' ? 'active' : ''}>
-            Inventory
-            {lowStockCount > 0 && (
-              <span style={{
-                display: 'inline-block',
-                marginLeft: '6px',
-                background: '#dc3545',
-                color: '#fff',
-                borderRadius: '10px',
-                fontSize: '11px',
-                padding: '1px 7px',
-                fontWeight: 'bold',
-                verticalAlign: 'middle',
-              }}>
-                {lowStockCount}
-              </span>
-            )}
-          </Link>
-          {isManagerOrAbove && (
-            <Link to="/teams" className={location.pathname === '/teams' ? 'active' : ''}>Teams</Link>
-          )}
-          {isManagerOrAbove && (
-            <Link to="/plans" className={location.pathname === '/plans' ? 'active' : ''}>
-              QMS Plans
-            </Link>
-          )}
-          {isAdmin && (
-            <Link to="/users" className={location.pathname === '/users' ? 'active' : ''}>Users</Link>
-          )}
-        </div>
-        <div className="nav-user">
-          <span className="user-name">{user?.name}</span>
-          {user?.role && (
-            <span
-              style={{
-                fontSize: '11px',
-                background: '#e9ecef',
-                color: '#495057',
-                padding: '2px 8px',
-                borderRadius: '10px',
-                marginRight: '8px',
-              }}
-            >
-              {user.role}
-            </span>
-          )}
-          <button className="btn btn-secondary btn-sm" onClick={logout}>Logout</button>
+    <aside className="sidebar">
+      <div className="sidebar-logo">
+        <div className="sidebar-logo-icon">📦</div>
+        <div>
+          <div className="sidebar-logo-text">PIS</div>
+          <div className="sidebar-logo-sub">Product Information</div>
         </div>
       </div>
-    </nav>
+
+      <nav className="sidebar-nav">
+        <button
+          className={`sidebar-nav-item ${isActive('/') ? 'active' : ''}`}
+          onClick={() => go('/')}
+        >
+          <span className="sidebar-nav-icon">📊</span>
+          Dashboard
+        </button>
+        <button
+          className={`sidebar-nav-item ${isActive('/products') ? 'active' : ''}`}
+          onClick={() => go('/products')}
+        >
+          <span className="sidebar-nav-icon">📦</span>
+          Products
+        </button>
+        <button
+          className={`sidebar-nav-item ${isActive('/locations') ? 'active' : ''}`}
+          onClick={() => go('/locations')}
+        >
+          <span className="sidebar-nav-icon">📍</span>
+          Locations
+        </button>
+        <button
+          className={`sidebar-nav-item ${isActive('/inventory') ? 'active' : ''}`}
+          onClick={() => go('/inventory')}
+        >
+          <span className="sidebar-nav-icon">🗃️</span>
+          Inventory
+          {lowStockCount > 0 && (
+            <span className="sidebar-badge">{lowStockCount}</span>
+          )}
+        </button>
+
+        {isManagerOrAbove && (
+          <>
+            <div className="sidebar-section-label">Management</div>
+            <button
+              className={`sidebar-nav-item ${isActive('/teams') ? 'active' : ''}`}
+              onClick={() => go('/teams')}
+            >
+              <span className="sidebar-nav-icon">👥</span>
+              Teams
+            </button>
+            <button
+              className={`sidebar-nav-item ${isActive('/plans') ? 'active' : ''}`}
+              onClick={() => go('/plans')}
+            >
+              <span className="sidebar-nav-icon">💎</span>
+              QMS Plans
+            </button>
+          </>
+        )}
+        {isAdmin && (
+          <button
+            className={`sidebar-nav-item ${isActive('/users') ? 'active' : ''}`}
+            onClick={() => go('/users')}
+          >
+            <span className="sidebar-nav-icon">🧑‍💼</span>
+            Users
+          </button>
+        )}
+      </nav>
+
+      <div className="sidebar-footer">
+        <div className="sidebar-user">
+          <div className="sidebar-avatar">{avatarInitial}</div>
+          <div className="sidebar-user-info">
+            <div className="sidebar-user-name">{displayName}</div>
+            {user?.role && <div className="sidebar-user-role">{user.role}</div>}
+          </div>
+          <button className="sidebar-logout" onClick={logout} title="Sign out">→</button>
+        </div>
+      </div>
+    </aside>
+  )
+}
+
+function PageHeader() {
+  const location = useLocation()
+  const pageInfo = PAGE_TITLES[location.pathname] || { title: 'PIS', subtitle: '' }
+
+  return (
+    <div className="page-header">
+      <div className="page-header-left">
+        <h1>{pageInfo.title}</h1>
+        {pageInfo.subtitle && <p>{pageInfo.subtitle}</p>}
+      </div>
+    </div>
+  )
+}
+
+function AppLayout() {
+  return (
+    <div className="app-layout">
+      <Sidebar />
+      <div className="main-content">
+        <PageHeader />
+        <div className="page-body">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/locations" element={<Locations />} />
+            <Route path="/inventory" element={<Inventory />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/teams" element={<Teams />} />
+            <Route path="/plans" element={<Plans />} />
+          </Routes>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -107,20 +186,7 @@ function App() {
           path="/*"
           element={
             <ProtectedRoute>
-              <div className="App">
-                <Navigation />
-                <div className="container">
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/products" element={<Products />} />
-                    <Route path="/locations" element={<Locations />} />
-                    <Route path="/inventory" element={<Inventory />} />
-                    <Route path="/users" element={<Users />} />
-                    <Route path="/teams" element={<Teams />} />
-                    <Route path="/plans" element={<Plans />} />
-                  </Routes>
-                </div>
-              </div>
+              <AppLayout />
             </ProtectedRoute>
           }
         />
