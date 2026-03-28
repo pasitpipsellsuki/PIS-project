@@ -52,6 +52,8 @@ jobs:
       - name: Build Frontend
         run: npm run build
         working-directory: ./PIS/src/frontend
+        env:
+          VITE_API_URL: https://pis-project-prod.pasit-pip.workers.dev
 
       - name: Deploy to Cloudflare Pages
         run: npx wrangler pages deploy src/frontend/dist --project-name=pis-project --branch=master

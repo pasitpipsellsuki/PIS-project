@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 
 // API base URL - adjust based on your deployment
-const API_URL = (import.meta.env.VITE_API_URL as string) || 'https://pis-project.pasitpipsellsuki.workers.dev'
+const API_URL = (import.meta.env.VITE_API_URL as string) || 'https://pis-project-uat.pasit-pip.workers.dev'
 
 // Maximum number of retries
 const MAX_RETRIES = 3
